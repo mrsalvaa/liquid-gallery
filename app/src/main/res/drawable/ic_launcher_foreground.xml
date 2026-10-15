@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Foto de detrás, girada -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:rotation="-10">
+        <path
+            android:fillColor="#18FFFFFF"
+            android:strokeWidth="1"
+            android:strokeColor="#66FFFFFF"
+            android:pathData="M37,32h34a7,7 0,0 1,7 7v28a7,7 0,0 1,-7 7h-34a7,7 0,0 1,-7 -7v-28a7,7 0,0 1,7 -7z" />
+    </group>
+    <!-- Foto de cristal -->
+    <path
+        android:fillColor="#28FFFFFF"
+        android:strokeWidth="1.2"
+        android:strokeColor="#B3FFFFFF"
+        android:pathData="M38,34h34a7,7 0,0 1,7 7v28a7,7 0,0 1,-7 7h-34a7,7 0,0 1,-7 -7v-28a7,7 0,0 1,7 -7z" />
+    <!-- Brillo especular superior -->
+    <path android:pathData="M38,35.2h34a5.8,5.8 0,0 1,5.8 5.8v6c-14,-4 -31.6,-4 -45.6,0v-6a5.8,5.8 0,0 1,5.8 -5.8z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="35"
+                android:endX="54"
+                android:endY="47"
+                android:startColor="#4DFFFFFF"
+                android:endColor="#00FFFFFF" />
+        </aapt:attr>
+    </path>
+    <!-- Sol -->
+    <path
+        android:fillColor="#FFF472B6"
+        android:pathData="M64,47m-4.2,0a4.2,4.2 0,1 1,8.4 0a4.2,4.2 0,1 1,-8.4 0" />
+    <!-- Montañas -->
+    <path
+        android:fillColor="#E6FFFFFF"
+        android:pathData="M32.2,67.5L46,52.5l9,9.5l5,-5l18.8,12.2v0.8a5.8,5.8 0,0 1,-5.8 5.8h-35a5.8,5.8 0,0 1,-5.8 -5.8z" />
+    <path
+        android:fillColor="#FF7CC8FF"
+        android:pathData="M55,62l5,-5l18.8,12.2v0.8a5.8,5.8 0,0 1,-5.8 5.8h-12z" />
+</vector>

@@ -1,0 +1,42 @@
+package dev.liquidgallery.util
+
+import android.content.Context
+import android.net.Uri
+import android.util.Size
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DataSource
+import coil3.fetch.FetchResult
+import coil3.fetch.Fetcher
+import coil3.fetch.ImageFetchResult
+import coil3.key.Keyer
+import coil3.request.Options
+import coil3.size.pxOrElse
+import dev.liquidgallery.data.Media
+
+/**
+ * Miniatura de una foto o un vídeo. Usa las que Android ya tiene guardadas (rápido y sin
+ * decodificar la foto entera). [version] cambia cuando se edita el archivo.
+ */
+data class Thumb(val uri: Uri, val version: Long, val px: Int)
+
+fun Media.thumb(px: Int = 384) = Thumb(uri, date xor size, px)
+
+class ThumbFetcher(private val context: Context, private val data: Thumb, private val options: Options) : Fetcher {
+    override suspend fun fetch(): FetchResult {
+        val w = options.size.width.pxOrElse { data.px }.coerceAtMost(data.px)
+        val h = options.size.height.pxOrElse { data.px }.coerceAtMost(data.px)
+        val side = maxOf(w, h, 96)
+        val bitmap = context.contentResolver.loadThumbnail(data.uri, Size(side, side), null)
+        return ImageFetchResult(image = bitmap.asImage(), isSampled = true, dataSource = DataSource.DISK)
+    }
+
+    class Factory(private val context: Context) : Fetcher.Factory<Thumb> {
+        override fun create(data: Thumb, options: Options, imageLoader: ImageLoader): Fetcher =
+            ThumbFetcher(context, data, options)
+    }
+}
+
+class ThumbKeyer : Keyer<Thumb> {
+    override fun key(data: Thumb, options: Options) = "thumb:${data.uri}:${data.version}:${data.px}"
+}

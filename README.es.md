@@ -5,7 +5,7 @@
 Se instala en el móvil como **Galería** (o *Gallery*, según el idioma).
 
 Galería para Android libre y sin rastreo, inspirada en la de Samsung y con la misma interfaz de
-cristal líquido que [Liquid Clock](../clock): superficies que refractan lo que tienen detrás
+cristal líquido que [Liquid Clock](https://github.com/mrsalvaa/liquid-clock): superficies que refractan lo que tienen detrás
 (gracias a [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)) y botones que se deforman como
 una gota al pulsarlos.
 
@@ -53,6 +53,28 @@ repetir) e icono de la app (Liquid, Material, Samsung, iPhone o Motorola).
 - **Fotos y vídeos**: para mostrarlos. En Android 14 puedes darle acceso solo a algunas.
 - **Gestionar contenido multimedia** (opcional): sin él, Android pide confirmación cada vez que
   borras, mueves o marcas un favorito. Se activa desde **Más** o **Ajustes**.
+
+## Descargar
+
+Los cambios de cada versión están en el [registro de cambios](CHANGELOG.es.md).
+
+Descarga el APK desde [Releases](../../releases) e instálalo (Android 12 o superior).
+
+Comprueba que el archivo no está alterado:
+
+```bash
+sha256sum -c liquid-gallery-v0.2.0.apk.sha256
+```
+
+Y que está firmado con la clave del proyecto (huella SHA-256 del certificado):
+
+```
+48:2B:BE:8C:2B:AF:CA:85:A0:A7:57:78:EA:EB:A4:64:3E:23:85:AD:FB:DE:23:2E:F8:30:F4:B5:8B:4C:A5:61
+```
+
+```bash
+apksigner verify --print-certs liquid-gallery-v0.2.0.apk
+```
 
 ## Compilar
 

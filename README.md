@@ -5,7 +5,7 @@
 Installs on the phone as **Gallery** (*Galería* in Spanish).
 
 A free, tracker-free Android gallery inspired by Samsung's, with the same liquid-glass interface
-as [Liquid Clock](../clock): surfaces that refract what's behind them (thanks to
+as [Liquid Clock](https://github.com/mrsalvaa/liquid-clock): surfaces that refract what's behind them (thanks to
 [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)) and buttons that squish like a droplet.
 
 **It doesn't request the internet permission**, and has no ads or telemetry. Licensed under GPL-3.0.
@@ -25,6 +25,28 @@ as [Liquid Clock](../clock): surfaces that refract what's behind them (thanks to
 - **Editor**: crop with aspect ratios, rotate, flip, brightness, contrast, saturation, warmth and
   filters; hold to compare; save as a copy or overwrite.
 - Works as a photo/video viewer for other apps.
+
+## Download
+
+See the [changelog](CHANGELOG.md) for what's new in each version.
+
+Get the APK from [Releases](../../releases) and install it (Android 12 or later).
+
+Check the file wasn't altered:
+
+```bash
+sha256sum -c liquid-gallery-v0.2.0.apk.sha256
+```
+
+And that it's signed with the project key (certificate SHA-256 fingerprint):
+
+```
+48:2B:BE:8C:2B:AF:CA:85:A0:A7:57:78:EA:EB:A4:64:3E:23:85:AD:FB:DE:23:2E:F8:30:F4:B5:8B:4C:A5:61
+```
+
+```bash
+apksigner verify --print-certs liquid-gallery-v0.2.0.apk
+```
 
 ## Build
 

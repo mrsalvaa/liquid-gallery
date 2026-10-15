@@ -38,6 +38,10 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Photo
 import androidx.compose.material.icons.rounded.PhotoAlbum
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -298,9 +302,9 @@ private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.swallowT
 }
 
 /**
- * Pestañas que se cambian deslizando. Todas siguen creadas (no se reconstruyen pantalla ni cristal
- * en cada cambio, que daba tirones a 120 Hz), pero solo se dibuja la actual y, mientras se arrastra,
- * la vecina. Las ocultas quedan debajo y se tragan los toques.
+ * Pestañas que se cambian deslizando, con el HorizontalPager de Compose: resuelve bien los bordes,
+ * las inercias y los deslizamientos rápidos encadenados. Las tres siguen creadas aunque no se vean
+ * (no se reconstruyen ni pierden el desplazamiento) y la burbuja de la barra sigue al dedo.
  */
 @Composable
 private fun SwipeTabs(
@@ -310,120 +314,29 @@ private fun SwipeTabs(
     onDrag: (Float?) -> Unit,
     content: @Composable (Int) -> Unit,
 ) {
-    var width by remember { mutableIntStateOf(1) }
-    // Pestaña mostrada: se adelanta al estado del padre para que un deslizamiento nuevo, lanzado
-    // mientras termina la animación del anterior, ya parta de la pestaña correcta.
-    var shown by remember { mutableIntStateOf(tab) }
-    // Desplazamiento del arrastre en px: negativo = hacia la pestaña siguiente.
-    var dragX by remember { mutableFloatStateOf(0f) }
-    val scope = rememberCoroutineScope()
-    var settle by remember { mutableStateOf<Job?>(null) }
-    fun report() = onDrag(if (dragX == 0f) null else shown - dragX / width)
-    fun commit(newTab: Int) {
-        shown = newTab
-        onTab(newTab)
+    val pager = rememberPagerState(initialPage = tab) { TAB_MORE + 1 }
+    val select by rememberUpdatedState(onTab)
+    val drag by rememberUpdatedState(onDrag)
+    // Deslizar: cuando la página se asienta pasa a ser la pestaña elegida.
+    LaunchedEffect(pager) {
+        snapshotFlow { pager.settledPage }.collect { select(it) }
     }
-
-    // Cambio desde fuera (tocar la barra): se corta cualquier animación y se muestra sin más.
+    // Mientras se mueve, la barra muestra la posición exacta (p. ej. 1,4).
+    LaunchedEffect(pager) {
+        snapshotFlow { if (pager.isScrollInProgress) pager.currentPage + pager.currentPageOffsetFraction else null }
+            .collect { drag(it) }
+    }
+    // Tocar la barra o volver atrás: se va a esa página.
     LaunchedEffect(tab) {
-        if (tab != shown) {
-            settle?.cancel()
-            dragX = 0f
-            shown = tab
-            onDrag(null)
-        }
+        if (pager.targetPage != tab) pager.animateScrollToPage(tab)
     }
-
-    Box(
-        Modifier
-            .fillMaxSize()
-            .onSizeChanged { width = it.width.coerceAtLeast(1) }
-            .draggable(
-                orientation = Orientation.Horizontal,
-                state = rememberDraggableState { delta ->
-                    val min = if (shown == TAB_MORE) 0f else -width.toFloat()
-                    val max = if (shown == TAB_PHOTOS) 0f else width.toFloat()
-                    dragX = (dragX + delta).coerceIn(min, max)
-                    report()
-                },
-                onDragStarted = {
-                    // Un deslizamiento nuevo interrumpe la animación del anterior. Si ya había pasado
-                    // de la mitad, la pestaña vecina pasa a ser la actual sin mover nada en pantalla.
-                    settle?.cancel()
-                    settle = null
-                    if (dragX < -width / 2f && shown < TAB_MORE) {
-                        dragX += width
-                        commit(shown + 1)
-                    } else if (dragX > width / 2f && shown > TAB_PHOTOS) {
-                        dragX -= width
-                        commit(shown - 1)
-                    }
-                },
-                onDragStopped = { velocity ->
-                    val fast = 1200f
-                    val target = when {
-                        shown < TAB_MORE && (dragX < -width * 0.3f || velocity < -fast && dragX < 0f) -> -width.toFloat()
-                        shown > TAB_PHOTOS && (dragX > width * 0.3f || velocity > fast && dragX > 0f) -> width.toFloat()
-                        else -> 0f
-                    }
-                    // En los extremos no hay pestaña a la que ir: sin velocidad y sin salirse de los
-                    // límites, para que la pantalla no se quede desplazada hacia la nada.
-                    val min = if (shown == TAB_MORE) 0f else -width.toFloat()
-                    val max = if (shown == TAB_PHOTOS) 0f else width.toFloat()
-                    val start = if (target == 0f && (velocity < 0f && dragX <= min || velocity > 0f && dragX >= max)) 0f else velocity
-                    settle = scope.launch {
-                        animate(dragX, target, start, spring(dampingRatio = 1f, stiffness = 500f)) { v, _ ->
-                            dragX = v.coerceIn(min, max)
-                            report()
-                        }
-                        if (target != 0f) commit(shown + if (target < 0f) 1 else -1)
-                        dragX = 0f
-                        onDrag(null)
-                    }
-                },
-            ),
-    ) {
-        for (t in TAB_PHOTOS..TAB_MORE) {
-            val active = t == shown
-            // Se ve si es la actual o la vecina que entra mientras se desliza.
-            val visible = { active || (t == shown + 1 && dragX < 0f) || (t == shown - 1 && dragX > 0f) }
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .zIndex(if (active) 1f else 0f)
-                    // offset y no graphicsLayer: una capa propia por pestaña encarece el dibujo del cristal.
-                    .offset {
-                        val x = when {
-                            active -> dragX
-                            t == shown + 1 && dragX < 0f -> dragX + width
-                            t == shown - 1 && dragX > 0f -> dragX - width
-                            // Las ocultas, fuera de la pantalla: así ningún toque cae sobre ellas
-                            // (p. ej. mientras la actual sale de lado al encadenar deslizamientos).
-                            else -> 4f * width
-                        }
-                        IntOffset(x.roundToInt(), 0)
-                    }
-                    // Sin llamar a drawContent: ni se graban sus capas ni se calcula su cristal.
-                    .drawWithContent { if (visible()) drawContent() }
-                    .then(if (active) Modifier else Modifier.clearAndSetSemantics { })
-                    // Las pestañas ocultas se tragan los toques para que no lleguen a sus botones
-                    // invisibles. Se decide al tocar: la vecina que está entrando sí los recibe, así
-                    // se pueden encadenar deslizamientos rápidos sin esperar a que termine el anterior.
-                    .pointerInput(Unit) {
-                        awaitEachGesture {
-                            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-                            if (visible()) return@awaitEachGesture
-                            down.consume()
-                            do {
-                                val event = awaitPointerEvent(PointerEventPass.Initial)
-                                event.changes.forEach { it.consume() }
-                            } while (event.changes.any { it.pressed })
-                        }
-                    },
-            ) {
-                CompositionLocalProvider(LocalTabActive provides (active && onScreen)) { content(t) }
-            }
-        }
+    HorizontalPager(
+        state = pager,
+        beyondViewportPageCount = TAB_MORE,
+        userScrollEnabled = onScreen,
+        key = { it },
+        modifier = Modifier.fillMaxSize(),
+    ) { page ->
+        CompositionLocalProvider(LocalTabActive provides (page == pager.currentPage && onScreen)) { content(page) }
     }
 }
-

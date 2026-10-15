@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF05070C"
+        android:pathData="M0,0h108v108h-108z" />
+    <!-- Resplandor celeste -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="30"
+                android:centerY="28"
+                android:gradientRadius="62"
+                android:startColor="#8038BDF8"
+                android:endColor="#0038BDF8" />
+        </aapt:attr>
+    </path>
+    <!-- Resplandor rosa -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="82"
+                android:centerY="86"
+                android:gradientRadius="60"
+                android:startColor="#80F472B6"
+                android:endColor="#00F472B6" />
+        </aapt:attr>
+    </path>
+</vector>

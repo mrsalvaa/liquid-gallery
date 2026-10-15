@@ -7,6 +7,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import kotlinx.coroutines.Job
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -226,10 +232,26 @@ fun ViewerScreen(
         chrome = false
     }
 
-    // Deslizar hacia abajo cierra; hacia arriba abre los detalles.
-    val dismiss = remember { Animatable(0f) }
+    // Deslizar hacia abajo cierra; hacia arriba abre los detalles (y, abiertos, hacia abajo los
+    // cierra). El arrastre se guarda en un valor que cambia al instante: si cada movimiento lanzara
+    // una corrutina, las que llegan tarde cortarían la animación de vuelta y la foto se quedaría a
+    // medio camino.
+    var drag by remember { mutableFloatStateOf(0f) }
+    var settleJob by remember { mutableStateOf<Job?>(null) }
+    fun settle(velocity: Float = 0f) {
+        settleJob?.cancel()
+        settleJob = scope.launch {
+            animate(drag, 0f, velocity, spring(dampingRatio = 0.85f, stiffness = 450f)) { v, _ -> drag = v }
+        }
+    }
     val density = LocalDensity.current
     val closeAt = with(density) { 120.dp.toPx() }
+    // Con los detalles abiertos la foto se encoge y sube al hueco libre encima de la tarjeta, sea
+    // cual sea su forma (vertical, apaisada, panorámica).
+    var screenH by remember { mutableIntStateOf(1) }
+    var cardH by remember { mutableIntStateOf(0) }
+    val lift by animateFloatAsState(if (details) 1f else 0f, spring(dampingRatio = 0.9f, stiffness = 380f), label = "lift")
+    val tap: () -> Unit = { if (details) details = false else chrome = !chrome }
 
     val backdrop = rememberLayerBackdrop()
     Box(Modifier.fillMaxSize()) {
@@ -237,7 +259,10 @@ fun ViewerScreen(
             Modifier
                 .fillMaxSize()
                 .layerBackdrop(backdrop)
-                .background(bg.copy(alpha = 1f - (abs(dismiss.value) / (closeAt * 3)).coerceIn(0f, 0.7f))),
+                .drawBehind {
+                    val fade = if (details || drag <= 0f) 0f else (drag / (closeAt * 3)).coerceIn(0f, 0.7f)
+                    drawRect(bg.copy(alpha = 1f - fade))
+                },
         ) {
             HorizontalPager(
                 state = pager,
@@ -246,24 +271,36 @@ fun ViewerScreen(
                 pageSpacing = 12.dp,
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset { IntOffset(0, dismiss.value.roundToInt()) }
+                    .onSizeChanged { screenH = it.height.coerceAtLeast(1) }
                     .graphicsLayer {
-                        val s = 1f - (abs(dismiss.value) / (closeAt * 8)).coerceIn(0f, 0.15f)
-                        scaleX = s
-                        scaleY = s
+                        val h = screenH.toFloat()
+                        val free = (h - cardH).coerceIn(h * 0.3f, h)
+                        val fit = 1f + (free / h - 1f) * lift
+                        val shrink = if (details) 1f else 1f - (abs(drag) / (closeAt * 8)).coerceIn(0f, 0.15f)
+                        scaleX = fit * shrink
+                        scaleY = fit * shrink
+                        translationY = -(h - free) / 2f * lift + drag
                     }
                     .draggable(
                         orientation = Orientation.Vertical,
-                        enabled = !zoomed && !details,
-                        state = rememberDraggableState { d -> scope.launch { dismiss.snapTo(dismiss.value + d) } },
+                        enabled = !zoomed,
+                        state = rememberDraggableState { d ->
+                            // Con los detalles abiertos solo se sigue al dedo hacia abajo.
+                            drag = if (details) (drag + d).coerceAtLeast(-closeAt / 4) else drag + d
+                        },
+                        onDragStarted = { settleJob?.cancel() },
                         onDragStopped = { v ->
                             when {
-                                dismiss.value > closeAt || v > 2500f -> close()
-                                dismiss.value < -closeAt / 2 || v < -2500f -> {
-                                    if (!readOnly) details = true
-                                    dismiss.animateTo(0f, spring(dampingRatio = 0.8f))
+                                details -> {
+                                    if (drag > closeAt / 2 || v > 1500f) details = false
+                                    settle(v)
                                 }
-                                else -> dismiss.animateTo(0f, spring(dampingRatio = 0.8f))
+                                drag > closeAt || v > 2500f -> close()
+                                drag < -closeAt / 2 || v < -2500f -> {
+                                    if (!readOnly) details = true
+                                    settle()
+                                }
+                                else -> settle(v)
                             }
                         },
                     ),
@@ -275,13 +312,13 @@ fun ViewerScreen(
                         m, player,
                         playing = playingId == m.id,
                         onPlay = { play(m) },
-                        onTap = { chrome = !chrome },
+                        onTap = tap,
                     )
                 } else {
                     ImagePage(
                         m,
                         isCurrent = isCurrent,
-                        onTap = { chrome = !chrome },
+                        onTap = tap,
                         onZoomed = { if (isCurrent) zoomed = it },
                     )
                 }
@@ -377,7 +414,7 @@ fun ViewerScreen(
 
             AnimatedVisibility(
                 details,
-                Modifier.align(Alignment.BottomCenter),
+                Modifier.align(Alignment.BottomCenter).onSizeChanged { cardH = it.height },
                 enter = fadeIn() + slideInVertically { it },
                 exit = fadeOut() + slideOutVertically { it },
             ) {

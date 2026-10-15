@@ -1,5 +1,13 @@
 # Registro de cambios
 
+## 0.3.2
+
+- Arreglado: deslizar varias veces seguidas hacia la última pestaña podía dejar la app sin responder.
+  Las pestañas usan ahora el deslizamiento estándar de Android.
+- Arreglado: al cerrar los detalles de una foto, esta se quedaba subida a medio camino.
+- Con los detalles abiertos, la foto se encoge para verse entera encima de la tarjeta, sea vertical,
+  apaisada o panorámica. Se cierran deslizando hacia abajo o tocando la foto.
+
 ## 0.2.0
 
 - Pellizcar en Imágenes escala la cuadrícula bajo los dedos y cambia de columnas con una animación.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+- Fixed: swiping several times in a row towards the last tab could leave the app unresponsive.
+  Tabs now use Android's standard pager.
+- Fixed: closing a photo's details left the photo stuck halfway up.
+- With details open, the photo shrinks to fit above the card whatever its shape (portrait,
+  landscape, panorama). Close them by swiping down or tapping the photo.
+
 ## 0.2.0
 
 - Pinching in Pictures scales the grid under your fingers and switches columns with an animation.

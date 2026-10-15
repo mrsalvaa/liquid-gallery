@@ -58,6 +58,10 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Wallpaper
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Unarchive
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -155,7 +159,8 @@ fun ViewerScreen(
     val trash by MediaRepo.trash.collectAsStateWithLifecycle()
     val prefs by Stores.albums.state.collectAsStateWithLifecycle()
     val settings by Stores.settings.state.collectAsStateWithLifecycle()
-    val items = external ?: remember(source, media, trash, prefs.hidden) { itemsFor(source, media, trash, prefs) }
+    val vault by dev.liquidgallery.data.Vault.media.collectAsStateWithLifecycle()
+    val items = external ?: remember(source, media, trash, prefs.archived, vault) { itemsFor(source, media, trash, prefs, vault) }
     val itemsState = rememberUpdatedState(items)
     val actions = LocalActions.current
     val sheet = LocalActionSheet.current
@@ -163,6 +168,13 @@ fun ViewerScreen(
     val p = LocalGlass.current
     val scope = rememberCoroutineScope()
     val isTrash = source == Source.Trash
+    val isVault = source == Source.Vault
+    val unlocked by dev.liquidgallery.data.VaultLock.unlocked.collectAsStateWithLifecycle()
+    if (isVault && !unlocked) {
+        LaunchedEffect(Unit) { onClose(null) }
+        Box(Modifier.fillMaxSize().background(Color.Black))
+        return
+    }
     val readOnly = external != null && external.all { it.id < 0 }
 
     var currentId by rememberSaveable { mutableLongStateOf(startId) }
@@ -301,7 +313,7 @@ fun ViewerScreen(
                             Text(timeOf(current.date), color = fg.copy(alpha = 0.7f), fontSize = 13.sp)
                         }
                     }
-                    if (!readOnly && !isTrash) {
+                    if (!readOnly && !isTrash && !isVault) {
                         GlassIconButton(Icons.Rounded.MoreVert, "Más", {
                             sheet(moreSheet(current, actions, prompt, context) { details = true })
                         })
@@ -330,6 +342,13 @@ fun ViewerScreen(
                             when {
                                 readOnly -> {
                                     BarButton(Icons.Rounded.Share, "Compartir", fg) { actions.share(listOf(current)) }
+                                }
+                                isVault -> {
+                                    BarButton(Icons.Rounded.Visibility, "Mostrar", fg) { actions.unhide(listOf(current)) }
+                                    BarButton(Icons.Rounded.Share, "Compartir", fg) { actions.share(listOf(current)) }
+                                    BarButton(Icons.Rounded.DeleteForever, "Eliminar", p.danger) {
+                                        sheet(deleteHiddenSheet(listOf(current), actions) {})
+                                    }
                                 }
                                 isTrash -> {
                                     BarButton(Icons.Rounded.Restore, "Restaurar", fg) { actions.restore(listOf(current)) }
@@ -528,6 +547,12 @@ private fun moreSheet(
         SheetAction("Detalles", Icons.Rounded.Info, onClick = onDetails),
         SheetAction("Mover a un álbum", Icons.AutoMirrored.Rounded.DriveFileMove) { actions.pickAlbum(listOf(m), false) },
         SheetAction("Copiar a un álbum", Icons.Rounded.ContentCopy) { actions.pickAlbum(listOf(m), true) },
+        if (m.id in dev.liquidgallery.data.Stores.albums.value.archived) {
+            SheetAction("Desarchivar", Icons.Rounded.Unarchive) { actions.archive(listOf(m), false) }
+        } else {
+            SheetAction("Archivar", Icons.Rounded.Archive) { actions.archive(listOf(m), true) }
+        },
+        SheetAction("Ocultar", Icons.Rounded.VisibilityOff) { actions.hide(listOf(m)) },
         SheetAction("Cambiar el nombre", Icons.Rounded.DriveFileRenameOutline) {
             prompt(PromptSpec("Cambiar el nombre", "Guardar", m.name.substringBeforeLast('.')) { actions.rename(m, it) })
         },

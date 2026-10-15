@@ -1,6 +1,8 @@
 package dev.liquidgallery.util
 
 import android.content.Context
+import android.media.ThumbnailUtils
+import java.io.File
 import android.net.Uri
 import android.util.Size
 import coil3.ImageLoader
@@ -27,7 +29,18 @@ class ThumbFetcher(private val context: Context, private val data: Thumb, privat
         val w = options.size.width.pxOrElse { data.px }.coerceAtMost(data.px)
         val h = options.size.height.pxOrElse { data.px }.coerceAtMost(data.px)
         val side = maxOf(w, h, 96)
-        val bitmap = context.contentResolver.loadThumbnail(data.uri, Size(side, side), null)
+        val bitmap = if (data.uri.scheme == "file") {
+            // Archivos de la bóveda: Android no tiene miniaturas de ellos.
+            val file = File(data.uri.path!!)
+            val video = file.extension.lowercase() in VIDEO_EXTENSIONS
+            if (video) {
+                ThumbnailUtils.createVideoThumbnail(file, Size(side, side), null)
+            } else {
+                ThumbnailUtils.createImageThumbnail(file, Size(side, side), null)
+            }
+        } else {
+            context.contentResolver.loadThumbnail(data.uri, Size(side, side), null)
+        }
         return ImageFetchResult(image = bitmap.asImage(), isSampled = true, dataSource = DataSource.DISK)
     }
 
@@ -36,6 +49,8 @@ class ThumbFetcher(private val context: Context, private val data: Thumb, privat
             ThumbFetcher(context, data, options)
     }
 }
+
+private val VIDEO_EXTENSIONS = setOf("mp4", "mkv", "webm", "3gp", "mov", "avi", "m4v", "ts")
 
 class ThumbKeyer : Keyer<Thumb> {
     override fun key(data: Thumb, options: Options) = "thumb:${data.uri}:${data.version}:${data.px}"

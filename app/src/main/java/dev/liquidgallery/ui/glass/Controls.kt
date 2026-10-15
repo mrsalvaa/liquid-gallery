@@ -1,5 +1,8 @@
 package dev.liquidgallery.ui.glass
 
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -119,13 +122,17 @@ fun GlassNavBar(
     val bounce = spring<Float>(dampingRatio = 0.62f, stiffness = 420f)
     // El resaltado sigue a la burbuja (la pestaña más cercana), no al final de la animación.
     val highlighted by remember { derivedStateOf { bubble.value.roundToInt() } }
+    // Arrastre del dedo sobre la propia barra (posición en pestañas, p. ej. 1,4).
+    var barDrag by remember { mutableStateOf<Float?>(null) }
+    val select by rememberUpdatedState(onSelect)
+    val haptics = LocalHapticFeedback.current
     LaunchedEffect(Unit) {
-        snapshotFlow { dragPosition() }.collectLatest { drag ->
+        snapshotFlow { barDrag ?: dragPosition() }.collectLatest { drag ->
             if (drag != null) bubble.snapTo(drag) else bubble.animateTo(target.toFloat(), bounce)
         }
     }
     LaunchedEffect(selected) {
-        if (dragPosition() == null) bubble.animateTo(selected.toFloat(), bounce)
+        if (dragPosition() == null && barDrag == null) bubble.animateTo(selected.toFloat(), bounce)
     }
     GlassSurface(
         modifier.fillMaxWidth().height(70.dp),
@@ -133,7 +140,29 @@ fun GlassNavBar(
         strong = true,
         frost = 4.dp,
     ) {
-        BoxWithConstraints(Modifier.fillMaxSize().padding(6.dp)) {
+        BoxWithConstraints(
+            Modifier
+                .fillMaxSize()
+                .padding(6.dp)
+                .pointerInput(items.size) {
+                    val last = items.lastIndex.toFloat()
+                    fun itemPx() = size.width.toFloat() / items.size
+                    detectHorizontalDragGestures(
+                        onDragStart = { o -> barDrag = (o.x / itemPx() - 0.5f).coerceIn(0f, last) },
+                        onDragEnd = {
+                            barDrag?.let { select(it.roundToInt()) }
+                            barDrag = null
+                        },
+                        onDragCancel = { barDrag = null },
+                    ) { change, dx ->
+                        change.consume()
+                        val before = (barDrag ?: 0f).roundToInt()
+                        val now = ((barDrag ?: 0f) + dx / itemPx()).coerceIn(0f, last)
+                        barDrag = now
+                        if (now.roundToInt() != before) haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                },
+        ) {
             val itemWidth = maxWidth / items.size
             Box(
                 Modifier

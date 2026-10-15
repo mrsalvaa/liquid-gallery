@@ -18,6 +18,8 @@ as [Liquid Clock](../clock): surfaces that refract what's behind them (thanks to
   playback with glass controls, animated GIFs. Swipe down to close, up for details (EXIF).
 - **Albums**: Camera first, Favorites and Videos, create albums, move/copy, hide albums, album
   groups, custom/name/count/date ordering.
+- **Archive** (hidden from Pictures, kept in its album) and **Hidden**: a private vault inside the
+  app, unlocked with fingerprint, face or the phone's PIN. Uninstalling the app deletes it.
 - **Trash and favorites**: Android's own, shared with other galleries; trash empties after 30 days.
 - **Offline search** by name, album, date or type.
 - **Editor**: crop with aspect ratios, rotate, flip, brightness, contrast, saturation, warmth and

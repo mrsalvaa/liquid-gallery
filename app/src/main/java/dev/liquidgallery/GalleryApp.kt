@@ -8,6 +8,7 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.request.crossfade
 import dev.liquidgallery.data.MediaRepo
 import dev.liquidgallery.data.Stores
+import dev.liquidgallery.data.Vault
 import dev.liquidgallery.util.ThumbFetcher
 import dev.liquidgallery.util.ThumbKeyer
 
@@ -16,6 +17,7 @@ class GalleryApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         Stores.init(this)
         MediaRepo.init(this)
+        Vault.init(this)
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader =

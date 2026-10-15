@@ -24,6 +24,12 @@ abajo para cerrar y hacia arriba para ver los detalles (cámara, ISO, apertura, 
 **Álbumes**: Cámara siempre primero, Favoritos y Vídeos, crear álbumes, mover y copiar entre ellos,
 ocultarlos, agruparlos en grupos de álbumes y ordenarlos a mano, por nombre, por cantidad o por fecha.
 
+**Archivo**: quita fotos de Imágenes (capturas, memes) sin borrarlas; siguen en su álbum.
+
+**Oculto**: una bóveda privada dentro de la app que ninguna otra app ni galería puede ver. Se abre
+con huella, cara o el PIN del móvil y se vuelve a bloquear al salir. Ojo: si desinstalas la app sin
+mostrar antes lo oculto, se pierde.
+
 **Papelera y favoritos**: son los de Android, así que se comparten con otras galerías. La papelera
 borra sola lo que lleva 30 días.
 
@@ -40,7 +46,7 @@ original. Se guarda como copia o sobrescribiendo la original.
 
 En **Ajustes**: tema (sistema, claro u oscuro), fondo en movimiento o color de énfasis (los mismos
 de Liquid Clock), columnas de la cuadrícula y comportamiento de los vídeos (empezar sin sonido,
-repetir).
+repetir) e icono de la app (Liquid, Material, Samsung, iPhone o Motorola).
 
 ## Permisos
 
@@ -59,6 +65,6 @@ La clave de firma de release se lee de `~/.android-keys/liquid-gallery.propertie
 
 ## Librerías
 
-Todas libres: Jetpack Compose, [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass),
+Todas libres: Jetpack Compose, AndroidX Biometric, [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass),
 [Coil](https://github.com/coil-kt/coil), [Telephoto](https://github.com/saket/telephoto),
 [Media3 ExoPlayer](https://github.com/androidx/media) y ExifInterface.

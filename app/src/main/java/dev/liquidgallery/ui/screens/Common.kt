@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import dev.liquidgallery.data.Stores
+import dev.liquidgallery.data.Vault
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -59,17 +62,27 @@ sealed interface Source {
     data object Favorites : Source
     data object Videos : Source
     data object Trash : Source
+    data object Archive : Source
+    data object Vault : Source
     data class Search(val query: String) : Source
 }
 
-/** Elementos de una fuente. Los álbumes ocultos no salen en Imágenes, Vídeos ni búsquedas. */
-fun itemsFor(source: Source, media: List<Media>, trash: List<Media>, prefs: AlbumPrefs): List<Media> = when (source) {
-    Source.All -> if (prefs.hidden.isEmpty()) media else media.filter { it.album !in prefs.hidden }
+/** Elementos de una fuente. Lo archivado no sale en Imágenes, pero sí en su álbum y al buscar. */
+fun itemsFor(
+    source: Source,
+    media: List<Media>,
+    trash: List<Media>,
+    prefs: AlbumPrefs,
+    vault: List<Media> = emptyList(),
+): List<Media> = when (source) {
+    Source.All -> if (prefs.archived.isEmpty()) media else media.filter { it.id !in prefs.archived }
     is Source.Album -> media.filter { it.album == source.path }
     Source.Favorites -> media.filter { it.favorite }
-    Source.Videos -> media.filter { it.isVideo && it.album !in prefs.hidden }
+    Source.Videos -> media.filter { it.isVideo }
     Source.Trash -> trash.sortedByDescending { it.expires }
-    is Source.Search -> search(media.filter { it.album !in prefs.hidden }, source.query)
+    Source.Archive -> media.filter { it.id in prefs.archived }
+    Source.Vault -> vault
+    is Source.Search -> search(media, source.query)
 }
 
 private fun String.fold(): String =
@@ -100,14 +113,22 @@ fun shareMedia(context: Context, items: List<Media>) {
     if (items.isEmpty()) return
     val mime = items.map { it.mime }.distinct().singleOrNull()
         ?: if (items.all { it.isVideo }) "video/*" else if (items.none { it.isVideo }) "image/*" else "*/*"
+    // Lo de la bóveda se comparte a través del FileProvider de la app.
+    val uris = items.map { m ->
+        if (m.uri.scheme == "file") {
+            FileProvider.getUriForFile(context, "${context.packageName}.files", java.io.File(m.uri.path!!))
+        } else {
+            m.uri
+        }
+    }
     val intent = if (items.size == 1) {
-        Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_STREAM, items[0].uri)
+        Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_STREAM, uris[0])
     } else {
-        Intent(Intent.ACTION_SEND_MULTIPLE).putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(items.map { it.uri }))
+        Intent(Intent.ACTION_SEND_MULTIPLE).putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList<Uri>(uris))
     }.apply {
         type = mime
-        clipData = ClipData.newRawUri(null, items[0].uri).also { clip ->
-            items.drop(1).forEach { clip.addItem(ClipData.Item(it.uri)) }
+        clipData = ClipData.newRawUri(null, uris[0]).also { clip ->
+            uris.drop(1).forEach { clip.addItem(ClipData.Item(it)) }
         }
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
@@ -189,6 +210,45 @@ class GalleryActions(
                 after()
             }
         }
+    }
+
+    /** Archivar: sale de Imágenes pero sigue en su álbum. */
+    fun archive(items: List<Media>, archive: Boolean, after: () -> Unit = {}) {
+        val ids = items.map { it.id }.toSet()
+        Stores.albums.update { if (archive) it.copy(archived = it.archived + ids) else it.copy(archived = it.archived - ids) }
+        toast(
+            when {
+                archive && items.size == 1 -> "Archivado"
+                archive -> "${items.size} elementos archivados"
+                items.size == 1 -> "Ya no está archivado"
+                else -> "${items.size} elementos desarchivados"
+            },
+        )
+        after()
+    }
+
+    /** Ocultar: a la bóveda privada. */
+    fun hide(items: List<Media>, after: () -> Unit = {}) = scope.launch {
+        toast("Ocultando…")
+        val n = Vault.hide(context, ops, items)
+        if (n > 0) {
+            toast(if (n == 1) "Movido a Oculto" else "$n elementos movidos a Oculto")
+            after()
+        } else if (items.isNotEmpty()) {
+            toast("No se ocultó nada")
+        }
+    }
+
+    fun unhide(items: List<Media>, after: () -> Unit = {}) = scope.launch {
+        val n = Vault.restore(context, items)
+        toast(if (n == 1) "Restaurado a su álbum" else "$n elementos restaurados")
+        if (n > 0) after()
+    }
+
+    fun deleteHidden(items: List<Media>, after: () -> Unit = {}) = scope.launch {
+        Vault.delete(items)
+        toast(if (items.size == 1) "Eliminado" else "${items.size} elementos eliminados")
+        after()
     }
 
     fun rename(item: Media, name: String) = scope.launch {

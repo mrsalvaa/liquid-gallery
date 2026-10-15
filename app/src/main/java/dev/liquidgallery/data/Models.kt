@@ -23,11 +23,32 @@ data class AppSettings(
     val videoMuted: Boolean = false,
     /** Los vídeos vuelven a empezar al terminar. */
     val videoLoop: Boolean = false,
+    /** Índice del icono de la app (ver AppIcons). */
+    val appIcon: Int = 0,
     /** Ya se ofreció el permiso de gestionar multimedia (para no insistir). */
     val manageMediaOffered: Boolean = false,
 )
 
 /** Grupo de álbumes (como las carpetas de álbumes de Samsung). */
+@Serializable
+data class VaultItem(
+    /** Negativo, para no chocar con los ids de MediaStore. */
+    val id: Long,
+    /** Nombre del archivo dentro de la bóveda. */
+    val file: String,
+    val name: String,
+    val mime: String,
+    val video: Boolean,
+    val date: Long,
+    val size: Long,
+    val width: Int,
+    val height: Int,
+    val duration: Long,
+    /** Carpeta de la que salió, para devolverlo ahí. */
+    val album: String,
+    val albumName: String,
+)
+
 @Serializable
 data class AlbumGroup(
     val id: Long,
@@ -36,10 +57,11 @@ data class AlbumGroup(
     val albums: List<String> = emptyList(),
 )
 
-/** Preferencias de álbumes que no guarda Android: todo se identifica por su ruta relativa. */
+/** Preferencias que no guarda Android: los álbumes se identifican por su ruta relativa. */
 @Serializable
 data class AlbumPrefs(
-    val hidden: Set<String> = emptySet(),
+    /** Elementos archivados (por id de MediaStore): no salen en Imágenes, sí en su álbum. */
+    val archived: Set<Long> = emptySet(),
     /** Orden personalizado. Los que no están van al final, del más reciente al más antiguo. */
     val order: List<String> = emptyList(),
     val groups: List<AlbumGroup> = emptyList(),

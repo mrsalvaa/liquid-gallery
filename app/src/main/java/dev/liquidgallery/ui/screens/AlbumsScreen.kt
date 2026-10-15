@@ -45,6 +45,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.FolderOff
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PhotoAlbum
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.SwapVert
@@ -123,8 +124,9 @@ fun AlbumsScreen(
     onOpenSource: (Source) -> Unit,
     onOpenGroup: (Long) -> Unit,
     onReorder: () -> Unit,
-    onHidden: () -> Unit,
+    onVault: () -> Unit,
 ) {
+    val actions = LocalActions.current
     val media by MediaRepo.media.collectAsStateWithLifecycle()
     val prefs by Stores.albums.state.collectAsStateWithLifecycle()
     val settings by Stores.settings.state.collectAsStateWithLifecycle()
@@ -132,12 +134,12 @@ fun AlbumsScreen(
     val prompt = LocalPrompt.current
 
     val albums = remember(media, prefs, settings.albumSort) {
-        sortAlbums(buildAlbums(media, prefs), settings.albumSort, prefs.order).filter { it.path !in prefs.hidden }
+        sortAlbums(buildAlbums(media, prefs), settings.albumSort, prefs.order)
     }
     val tiles = remember(albums, prefs.groups, media) {
         val grouped = prefs.groups.flatMap { it.albums }.toSet()
         val favorites = media.filter { it.favorite }
-        val videos = media.filter { it.isVideo && it.album !in prefs.hidden }
+        val videos = media.filter { it.isVideo }
         buildList {
             val (pinned, rest) = albums.partition { dev.liquidgallery.data.isPinnedAlbum(it.path) }
             pinned.forEach { add(Tile.AlbumTile(it)) }
@@ -203,7 +205,7 @@ fun AlbumsScreen(
                                     )
                                 },
                                 SheetAction("Cambiar el orden", Icons.Rounded.SwapVert, onClick = onReorder),
-                                SheetAction("Álbumes ocultos", Icons.Rounded.VisibilityOff, onClick = onHidden),
+                                SheetAction("Oculto", Icons.Rounded.Lock, onClick = onVault),
                             ),
                         ),
                     )
@@ -215,7 +217,7 @@ fun AlbumsScreen(
                 is Tile.AlbumTile -> AlbumCard(
                     t.album.name, t.album.cover, t.album.count,
                     onClick = { onOpenSource(Source.Album(t.album.path)) },
-                    onLongClick = { sheet(albumSheet(t.album, prefs.groups, null, onOpenGroup)) },
+                    onLongClick = { sheet(albumSheet(t.album, prefs.groups, null, media, actions, sheet)) },
                 )
                 is Tile.Virtual -> AlbumCard(
                     t.name, t.cover, t.count, icon = t.icon,
@@ -280,7 +282,14 @@ private fun AlbumGrid(
     )
 }
 
-private fun albumSheet(album: Album, groups: List<AlbumGroup>, inGroup: AlbumGroup?, onOpenGroup: (Long) -> Unit): SheetSpec =
+private fun albumSheet(
+    album: Album,
+    groups: List<AlbumGroup>,
+    inGroup: AlbumGroup?,
+    media: List<Media>,
+    actions: GalleryActions,
+    sheet: (SheetSpec) -> Unit,
+): SheetSpec =
     SheetSpec(
         album.name,
         buildList {
@@ -309,14 +318,19 @@ private fun albumSheet(album: Album, groups: List<AlbumGroup>, inGroup: AlbumGro
                     },
                 )
             }
-            add(SheetAction("Ocultar álbum", Icons.Rounded.VisibilityOff) { toggleHidden(album.path) })
-            if (album.count == 0) {
-                add(
-                    SheetAction("Quitar álbum vacío", Icons.Rounded.Delete, danger = true) {
-                        Stores.albums.update { it.copy(empty = it.empty - album.path) }
-                    },
-                )
+            val items = media.filter { it.album == album.path }
+            if (items.isNotEmpty()) {
+                add(SheetAction("Ocultar álbum", Icons.Rounded.VisibilityOff) { actions.hide(items) })
             }
+            add(
+                SheetAction("Eliminar álbum", Icons.Rounded.Delete, danger = true) {
+                    if (items.isEmpty()) {
+                        Stores.albums.update { it.copy(empty = it.empty - album.path) }
+                    } else {
+                        sheet(deleteAlbumSheet(album.name, items, actions))
+                    }
+                },
+            )
         },
         subtitle = countLabel(album.count),
     )
@@ -438,6 +452,7 @@ private fun GroupCard(name: String, albums: List<Album>, onClick: () -> Unit, on
 /** Álbumes de un grupo. */
 @Composable
 fun GroupScreen(groupId: Long, padding: PaddingValues, onBack: () -> Unit, onOpenSource: (Source) -> Unit) {
+    val actions = LocalActions.current
     val media by MediaRepo.media.collectAsStateWithLifecycle()
     val prefs by Stores.albums.state.collectAsStateWithLifecycle()
     val settings by Stores.settings.state.collectAsStateWithLifecycle()
@@ -461,7 +476,7 @@ fun GroupScreen(groupId: Long, padding: PaddingValues, onBack: () -> Unit, onOpe
             AlbumCard(
                 a.name, a.cover, a.count,
                 onClick = { onOpenSource(Source.Album(a.path)) },
-                onLongClick = { sheet(albumSheet(a, prefs.groups, group, {})) },
+                onLongClick = { sheet(albumSheet(a, prefs.groups, group, media, actions, sheet)) },
             )
         }
     }
@@ -506,32 +521,6 @@ fun AlbumPickerScreen(items: List<Media>, copy: Boolean, padding: PaddingValues,
     }
 }
 
-/** Álbumes ocultos: no salen en Álbumes, Imágenes, Vídeos ni en la búsqueda. */
-@Composable
-fun HiddenAlbumsScreen(padding: PaddingValues, onBack: () -> Unit, onOpenSource: (Source) -> Unit) {
-    val media by MediaRepo.media.collectAsStateWithLifecycle()
-    val prefs by Stores.albums.state.collectAsStateWithLifecycle()
-    val hidden = remember(media, prefs) { buildAlbums(media, prefs).filter { it.path in prefs.hidden } }
-    AlbumGrid(padding, 3, null) {
-        item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
-            BackTitle("Álbumes ocultos", onBack, subtitle = "Mantén pulsado para volver a mostrar")
-        }
-        if (hidden.isEmpty()) {
-            item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
-                EmptyState("Ninguno oculto", "Oculta un álbum desde su menú.")
-            }
-        }
-        items(hidden.size, key = { hidden[it].path }) { i ->
-            val a = hidden[i]
-            AlbumCard(
-                a.name, a.cover, a.count, icon = Icons.Rounded.VisibilityOff,
-                onClick = { onOpenSource(Source.Album(a.path)) },
-                onLongClick = { toggleHidden(a.path) },
-            )
-        }
-    }
-}
-
 /** Ordenar álbumes a mano: arrastrar desde el asa. */
 @Composable
 fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
@@ -540,7 +529,7 @@ fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
     val settings by Stores.settings.state.collectAsStateWithLifecycle()
     val initial = remember {
         sortAlbums(buildAlbums(media, prefs), settings.albumSort, prefs.order)
-            .filter { !dev.liquidgallery.data.isPinnedAlbum(it.path) && it.path !in prefs.hidden }
+            .filter { !dev.liquidgallery.data.isPinnedAlbum(it.path) }
     }
     var list by remember { mutableStateOf(initial) }
     var dragging by remember { mutableIntStateOf(-1) }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:pivotX="54" android:pivotY="54" android:rotation="0">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8FF9500" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="45">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8FFCC00" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="90">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8A4D65E" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="135">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C834C759" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="180">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C830B0C7" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="225">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8007AFF" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="270">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8AF52DE" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="315">
+        <path
+            android:pathData="M54,28a8,13 0,1 1,0,26a8,13 0,1 1,0,-26z"
+            android:fillColor="#C8FF2D55" />
+    </group>
+</vector>

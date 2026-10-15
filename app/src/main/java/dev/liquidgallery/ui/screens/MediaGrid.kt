@@ -11,6 +11,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.geometry.isSpecified
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -81,6 +88,7 @@ import coil3.compose.AsyncImage
 import dev.liquidgallery.data.Media
 import dev.liquidgallery.ui.glass.GlassSurface
 import dev.liquidgallery.ui.glass.LocalGlass
+import dev.liquidgallery.ui.glass.LocalTabActive
 import dev.liquidgallery.util.dayLabel
 import dev.liquidgallery.util.duration
 import dev.liquidgallery.util.localDate
@@ -187,7 +195,11 @@ fun MediaGrid(
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val byMonth = columns >= 6
-    val entries = remember(items, byMonth, grouped) { buildEntries(items, byMonth, grouped) }
+    // Las cabeceras se calculan fuera del hilo principal (con miles de fotos tarda).
+    var entries by remember { mutableStateOf(buildEntries(items, byMonth, grouped)) }
+    LaunchedEffect(items, byMonth, grouped) {
+        entries = withContext(Dispatchers.Default) { buildEntries(items, byMonth, grouped) }
+    }
     val latestEntries by rememberUpdatedState(entries)
     val latestItems by rememberUpdatedState(items)
     val open by rememberUpdatedState(onOpen)
@@ -196,13 +208,15 @@ fun MediaGrid(
 
     // Barra de selección flotante mientras se selecciona.
     val postBar = LocalSelectionBar.current
-    if (selection.active && selectionBar != null) {
+    // Solo la pantalla visible maneja la selección (las pestañas ocultas siguen creadas).
+    val active = LocalTabActive.current
+    if (selection.active && selectionBar != null && active) {
         DisposableEffect(selectionBar) {
             postBar(selectionBar)
             onDispose { postBar(null) }
         }
     }
-    BackHandler(enabled = selection.active) { selection.clear() }
+    BackHandler(enabled = selection.active && active) { selection.clear() }
 
     // Si desaparecen elementos seleccionados (borrados, movidos), se quitan de la selección.
     LaunchedEffect(items) {
@@ -229,6 +243,9 @@ fun MediaGrid(
         val density = LocalDensity.current
         val edge = with(density) { 96.dp.toPx() }
         var dragPointer by remember { mutableStateOf<Offset?>(null) }
+        var pinchScale by remember { mutableFloatStateOf(1f) }
+        var pinchOrigin by remember { mutableStateOf(TransformOrigin.Center) }
+        var settle by remember { mutableStateOf<Job?>(null) }
         var autoScroll by remember { mutableStateOf<Job?>(null) }
 
         fun entryAt(pos: Offset): Entry.Cell? {
@@ -254,29 +271,59 @@ fun MediaGrid(
             verticalArrangement = Arrangement.spacedBy(2.dp),
             modifier = Modifier
                 .fillMaxSize()
-                // Pellizcar con dos dedos cambia el número de columnas.
+                // La cuadrícula se escala bajo los dedos; al pasar el umbral cambia de columnas
+                // sin saltos (la escala se compensa) y al soltar vuelve a su tamaño con un rebote.
+                .graphicsLayer {
+                    scaleX = pinchScale
+                    scaleY = pinchScale
+                    transformOrigin = pinchOrigin
+                }
                 .pointerInput(Unit) {
                     awaitEachGesture {
                         awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
                         var zoom = 1f
-                        var changed = false
+                        var pinching = false
+                        var current = cols
                         do {
                             val event = awaitPointerEvent(PointerEventPass.Initial)
                             if (event.changes.count { it.pressed } >= 2) {
+                                if (!pinching) {
+                                    pinching = true
+                                    settle?.cancel()
+                                    zoom = pinchScale
+                                    current = cols
+                                }
                                 zoom *= event.calculateZoom()
+                                val c = event.calculateCentroid(useCurrent = true)
+                                if (c.isSpecified && size.width > 0 && size.height > 0) {
+                                    pinchOrigin = TransformOrigin(c.x / size.width, c.y / size.height)
+                                }
                                 event.changes.forEach { it.consume() }
                                 val set = setColumns
-                                if (!changed && set != null && (zoom > 1.25f || zoom < 0.8f)) {
-                                    val i = GRID_COLUMNS.indexOf(cols).coerceAtLeast(0)
-                                    val next = GRID_COLUMNS.getOrNull(if (zoom > 1f) i - 1 else i + 1)
+                                if (set != null) {
+                                    val i = GRID_COLUMNS.indexOf(current).coerceAtLeast(0)
+                                    val next = when {
+                                        zoom > 1.2f -> GRID_COLUMNS.getOrNull(i - 1)
+                                        zoom < 0.84f -> GRID_COLUMNS.getOrNull(i + 1)
+                                        else -> null
+                                    }
                                     if (next != null) {
+                                        zoom /= current.toFloat() / next
+                                        current = next
                                         set(next)
                                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
-                                    changed = true
                                 }
+                                pinchScale = zoom.coerceIn(0.75f, 1.35f)
                             }
                         } while (event.changes.any { it.pressed })
+                        if (pinching) {
+                            settle = scope.launch {
+                                animate(pinchScale, 1f, animationSpec = spring(dampingRatio = 0.72f, stiffness = 420f)) { v, _ ->
+                                    pinchScale = v
+                                }
+                            }
+                        }
                     }
                 }
                 // Tocar abre (o selecciona); mantener pulsado y arrastrar selecciona un rango.
@@ -458,12 +505,19 @@ private fun Thumbnail(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer {
-                    scaleX = inset
-                    scaleY = inset
-                    clip = inset < 1f
-                    shape = RoundedCornerShape(8.dp)
-                },
+                // Capa propia solo al seleccionar: con cientos de miniaturas, cada capa cuesta.
+                .then(
+                    if (selecting) {
+                        Modifier.graphicsLayer {
+                            scaleX = inset
+                            scaleY = inset
+                            clip = inset < 1f
+                            shape = RoundedCornerShape(8.dp)
+                        }
+                    } else {
+                        Modifier
+                    },
+                ),
         )
         if (!small && (m.isVideo || m.isGif)) {
             Row(

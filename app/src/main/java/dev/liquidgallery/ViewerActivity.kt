@@ -5,7 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
+import dev.liquidgallery.util.preferHighestRefreshRate
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -38,7 +39,7 @@ import kotlinx.coroutines.withContext
  * Abre una foto o un vídeo que manda otra app. Si está en la galería se puede deslizar por su
  * álbum y usar todas las acciones; si no, solo verlo y compartirlo.
  */
-class ViewerActivity : ComponentActivity() {
+class ViewerActivity : FragmentActivity() {
     private val consent = ConsentRunner(this)
 
     /** null mientras se busca; luego el álbum y el elemento, o una lista externa. */
@@ -52,6 +53,7 @@ class ViewerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        preferHighestRefreshRate()
         val uri = intent?.data
         if (uri == null) {
             finish()

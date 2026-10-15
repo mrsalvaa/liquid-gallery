@@ -38,7 +38,8 @@ import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material.icons.rounded.VisibilityOff
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -173,7 +174,7 @@ fun MenuScreen(
     access: Int,
     onRequestAccess: () -> Unit,
     onOpenSource: (Source) -> Unit,
-    onHidden: () -> Unit,
+    onVault: () -> Unit,
     onSettings: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -196,10 +197,13 @@ fun MenuScreen(
         ScreenTitle("Más")
         GlassCard {
             MenuRow(Icons.Rounded.Favorite, "Favoritos", media.count { it.favorite }.toString()) { onOpenSource(Source.Favorites) }
-            MenuRow(Icons.Rounded.PlayCircle, "Vídeos", media.count { it.isVideo && it.album !in prefs.hidden }.toString()) {
+            MenuRow(Icons.Rounded.PlayCircle, "Vídeos", media.count { it.isVideo }.toString()) {
                 onOpenSource(Source.Videos)
             }
-            MenuRow(Icons.Rounded.VisibilityOff, "Álbumes ocultos", prefs.hidden.size.toString(), onClick = onHidden)
+            MenuRow(Icons.Rounded.Archive, "Archivo", media.count { it.id in prefs.archived }.toString()) {
+                onOpenSource(Source.Archive)
+            }
+            MenuRow(Icons.Rounded.Lock, "Oculto", null, onClick = onVault)
             MenuRow(Icons.Rounded.Delete, "Papelera", trash.size.toString()) { onOpenSource(Source.Trash) }
         }
         Spacer(Modifier.height(14.dp))
@@ -364,7 +368,7 @@ fun SearchScreen(
         query = text.trim()
         onQuery(query)
     }
-    val items = remember(query, media, prefs.hidden) {
+    val items = remember(query, media) {
         if (query.isEmpty()) emptyList() else itemsFor(Source.Search(query), media, emptyList(), prefs)
     }
     val focus = remember { FocusRequester() }

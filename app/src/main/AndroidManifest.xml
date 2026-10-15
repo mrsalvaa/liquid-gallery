@@ -22,7 +22,7 @@
 
     <application
         android:name=".GalleryApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -34,13 +34,78 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="true"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Un alias por icono de la app: solo uno está activo (ver AppIcons). -->
+        <activity-alias
+            android:name=".IconLiquid"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher"
+            android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.APP_GALLERY" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconMaterial"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_material"
+            android:roundIcon="@mipmap/ic_launcher_material"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconSamsung"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_samsung"
+            android:roundIcon="@mipmap/ic_launcher_samsung"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconIphone"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_iphone"
+            android:roundIcon="@mipmap/ic_launcher_iphone"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconMotorola"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_motorola"
+            android:roundIcon="@mipmap/ic_launcher_motorola"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Abre fotos y vídeos desde otras apps (archivos, cámara, mensajería...). -->
         <activity
@@ -61,5 +126,16 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
+
+        <!-- Para compartir lo que está en la bóveda (archivos privados de la app). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

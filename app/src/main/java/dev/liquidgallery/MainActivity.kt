@@ -366,9 +366,14 @@ private fun SwipeTabs(
                         shown > TAB_PHOTOS && (dragX > width * 0.3f || velocity > fast && dragX > 0f) -> width.toFloat()
                         else -> 0f
                     }
+                    // En los extremos no hay pestaña a la que ir: sin velocidad y sin salirse de los
+                    // límites, para que la pantalla no se quede desplazada hacia la nada.
+                    val min = if (shown == TAB_MORE) 0f else -width.toFloat()
+                    val max = if (shown == TAB_PHOTOS) 0f else width.toFloat()
+                    val start = if (target == 0f && (velocity < 0f && dragX <= min || velocity > 0f && dragX >= max)) 0f else velocity
                     settle = scope.launch {
-                        animate(dragX, target, velocity, spring(dampingRatio = 1f, stiffness = 500f)) { v, _ ->
-                            dragX = v
+                        animate(dragX, target, start, spring(dampingRatio = 1f, stiffness = 500f)) { v, _ ->
+                            dragX = v.coerceIn(min, max)
                             report()
                         }
                         if (target != 0f) commit(shown + if (target < 0f) 1 else -1)

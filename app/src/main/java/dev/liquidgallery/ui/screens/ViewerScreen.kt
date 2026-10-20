@@ -147,6 +147,9 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
+import dev.liquidgallery.util.plural
 
 /**
  * Visor a pantalla completa. [external] se usa al abrir un archivo desde otra app que no está en
@@ -337,12 +340,12 @@ fun ViewerScreen(
                     Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    GlassIconButton(Icons.AutoMirrored.Rounded.ArrowBack, "Atrás", { close() })
+                    GlassIconButton(Icons.AutoMirrored.Rounded.ArrowBack, str(R.string.back), { close() })
                     Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
                         if (isTrash) {
                             val days = TimeUnit.MILLISECONDS.toDays((current.expires - System.currentTimeMillis()).coerceAtLeast(0))
-                            Text("Papelera", color = fg, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-                            Text("Se eliminará en $days días", color = fg.copy(alpha = 0.7f), fontSize = 13.sp)
+                            Text(str(R.string.trash), color = fg, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                            Text(plural(R.plurals.deleted_in_days, days.toInt()), color = fg.copy(alpha = 0.7f), fontSize = 13.sp)
                         } else if (readOnly) {
                             Text(current.name, color = fg, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         } else {
@@ -351,7 +354,7 @@ fun ViewerScreen(
                         }
                     }
                     if (!readOnly && !isTrash && !isVault) {
-                        GlassIconButton(Icons.Rounded.MoreVert, "Más", {
+                        GlassIconButton(Icons.Rounded.MoreVert, str(R.string.more), {
                             sheet(moreSheet(current, actions, prompt, context) { details = true })
                         })
                     }
@@ -378,33 +381,33 @@ fun ViewerScreen(
                         ) {
                             when {
                                 readOnly -> {
-                                    BarButton(Icons.Rounded.Share, "Compartir", fg) { actions.share(listOf(current)) }
+                                    BarButton(Icons.Rounded.Share, str(R.string.share), fg) { actions.share(listOf(current)) }
                                 }
                                 isVault -> {
-                                    BarButton(Icons.Rounded.Visibility, "Mostrar", fg) { actions.unhide(listOf(current)) }
-                                    BarButton(Icons.Rounded.Share, "Compartir", fg) { actions.share(listOf(current)) }
-                                    BarButton(Icons.Rounded.DeleteForever, "Eliminar", p.danger) {
+                                    BarButton(Icons.Rounded.Visibility, str(R.string.unhide), fg) { actions.unhide(listOf(current)) }
+                                    BarButton(Icons.Rounded.Share, str(R.string.share), fg) { actions.share(listOf(current)) }
+                                    BarButton(Icons.Rounded.DeleteForever, str(R.string.delete), p.danger) {
                                         sheet(deleteHiddenSheet(listOf(current), actions) {})
                                     }
                                 }
                                 isTrash -> {
-                                    BarButton(Icons.Rounded.Restore, "Restaurar", fg) { actions.restore(listOf(current)) }
-                                    BarButton(Icons.Rounded.DeleteForever, "Eliminar", p.danger) { actions.deleteForever(listOf(current)) }
+                                    BarButton(Icons.Rounded.Restore, str(R.string.restore), fg) { actions.restore(listOf(current)) }
+                                    BarButton(Icons.Rounded.DeleteForever, str(R.string.delete), p.danger) { actions.deleteForever(listOf(current)) }
                                 }
                                 else -> {
                                     BarButton(
                                         if (current.favorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                                        "Favorito",
+                                        str(R.string.favorite),
                                         if (current.favorite) Color(0xFFFF6B8B) else fg,
                                     ) { actions.favorite(listOf(current), !current.favorite) }
                                     if (!current.isVideo && !current.isGif) {
-                                        BarButton(Icons.Rounded.Edit, "Editar", fg) {
+                                        BarButton(Icons.Rounded.Edit, str(R.string.edit), fg) {
                                             player.pause()
                                             onEdit(current)
                                         }
                                     }
-                                    BarButton(Icons.Rounded.Share, "Compartir", fg) { actions.share(listOf(current)) }
-                                    BarButton(Icons.Rounded.Delete, "Eliminar", fg) { actions.trash(listOf(current)) }
+                                    BarButton(Icons.Rounded.Share, str(R.string.share), fg) { actions.share(listOf(current)) }
+                                    BarButton(Icons.Rounded.Delete, str(R.string.delete), fg) { actions.trash(listOf(current)) }
                                 }
                             }
                         }
@@ -518,7 +521,7 @@ private fun VideoPage(m: Media, player: ExoPlayer, playing: Boolean, onPlay: () 
                 tint = Color.Black.copy(alpha = 0.25f),
                 onClick = onPlay,
             ) {
-                Icon(Icons.Rounded.PlayArrow, "Reproducir", Modifier.align(Alignment.Center).size(40.dp), tint = Color.White)
+                Icon(Icons.Rounded.PlayArrow, str(R.string.play), Modifier.align(Alignment.Center).size(40.dp), tint = Color.White)
             }
         }
     }
@@ -542,7 +545,7 @@ private fun VideoControls(player: ExoPlayer, fg: Color) {
     }
     GlassSurface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), strong = true, frost = 6.dp) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            BarButton(if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, "Reproducir", fg) {
+            BarButton(if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, str(R.string.play), fg) {
                 if (player.playbackState == Player.STATE_ENDED) player.seekTo(0)
                 if (player.isPlaying) player.pause() else player.play()
                 playing = !playing
@@ -564,7 +567,7 @@ private fun VideoControls(player: ExoPlayer, fg: Color) {
                 modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
             )
             Text(duration(length), color = fg, fontSize = 12.sp)
-            BarButton(if (muted) Icons.AutoMirrored.Rounded.VolumeOff else Icons.AutoMirrored.Rounded.VolumeUp, "Sonido", fg) {
+            BarButton(if (muted) Icons.AutoMirrored.Rounded.VolumeOff else Icons.AutoMirrored.Rounded.VolumeUp, str(R.string.sound), fg) {
                 muted = !muted
                 player.volume = if (muted) 0f else 1f
             }
@@ -581,26 +584,26 @@ private fun moreSheet(
 ) = SheetSpec(
     m.name,
     listOf(
-        SheetAction("Detalles", Icons.Rounded.Info, onClick = onDetails),
-        SheetAction("Mover a un álbum", Icons.AutoMirrored.Rounded.DriveFileMove) { actions.pickAlbum(listOf(m), false) },
-        SheetAction("Copiar a un álbum", Icons.Rounded.ContentCopy) { actions.pickAlbum(listOf(m), true) },
+        SheetAction(str(R.string.details), Icons.Rounded.Info, onClick = onDetails),
+        SheetAction(str(R.string.move_to_album), Icons.AutoMirrored.Rounded.DriveFileMove) { actions.pickAlbum(listOf(m), false) },
+        SheetAction(str(R.string.copy_to_album), Icons.Rounded.ContentCopy) { actions.pickAlbum(listOf(m), true) },
         if (m.id in dev.liquidgallery.data.Stores.albums.value.archived) {
-            SheetAction("Desarchivar", Icons.Rounded.Unarchive) { actions.archive(listOf(m), false) }
+            SheetAction(str(R.string.unarchive), Icons.Rounded.Unarchive) { actions.archive(listOf(m), false) }
         } else {
-            SheetAction("Archivar", Icons.Rounded.Archive) { actions.archive(listOf(m), true) }
+            SheetAction(str(R.string.do_archive), Icons.Rounded.Archive) { actions.archive(listOf(m), true) }
         },
-        SheetAction("Ocultar", Icons.Rounded.VisibilityOff) { actions.hide(listOf(m)) },
-        SheetAction("Cambiar el nombre", Icons.Rounded.DriveFileRenameOutline) {
-            prompt(PromptSpec("Cambiar el nombre", "Guardar", m.name.substringBeforeLast('.')) { actions.rename(m, it) })
+        SheetAction(str(R.string.hide), Icons.Rounded.VisibilityOff) { actions.hide(listOf(m)) },
+        SheetAction(str(R.string.rename), Icons.Rounded.DriveFileRenameOutline) {
+            prompt(PromptSpec(str(R.string.rename), str(R.string.save), m.name.substringBeforeLast('.')) { actions.rename(m, it) })
         },
-        SheetAction("Usar como…", Icons.Rounded.Wallpaper) {
+        SheetAction(str(R.string.use_as), Icons.Rounded.Wallpaper) {
             val intent = Intent(Intent.ACTION_ATTACH_DATA)
                 .setDataAndType(m.uri, m.mime)
                 .putExtra("mimeType", m.mime)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             context.startActivity(Intent.createChooser(intent, null))
         },
-        SheetAction("Abrir con…", Icons.AutoMirrored.Rounded.OpenInNew) {
+        SheetAction(str(R.string.open_with), Icons.AutoMirrored.Rounded.OpenInNew) {
             val intent = Intent(Intent.ACTION_VIEW).setDataAndType(m.uri, m.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             context.startActivity(Intent.createChooser(intent, null))
         },
@@ -649,11 +652,11 @@ private fun DetailsCard(m: Media, onClose: () -> Unit) {
             Text(fullDate(m.date), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Text(timeOf(m.date), fontSize = 14.sp, color = p.contentSecondary)
             Spacer(Modifier.height(16.dp))
-            DetailRow("Nombre", m.name)
-            DetailRow("Ubicación", "/${m.album}")
+            DetailRow(str(R.string.detail_name), m.name)
+            DetailRow(str(R.string.detail_location), "/${m.album}")
             val mp = m.width.toLong() * m.height / 1_000_000.0
             DetailRow(
-                if (m.isVideo) "Vídeo" else "Imagen",
+                str(if (m.isVideo) R.string.detail_video else R.string.detail_image),
                 buildString {
                     if (m.width > 0) append("${m.width} × ${m.height}")
                     if (!m.isVideo && mp >= 1) append(" · %.0f MP".format(mp))
@@ -661,9 +664,9 @@ private fun DetailsCard(m: Media, onClose: () -> Unit) {
                     append(" · ${fileSize(m.size)}")
                 },
             )
-            exif?.camera?.let { DetailRow("Cámara", it) }
-            exif?.shot?.let { DetailRow("Disparo", it) }
-            exif?.lens?.let { DetailRow("Objetivo", it) }
+            exif?.camera?.let { DetailRow(str(R.string.detail_camera), it) }
+            exif?.shot?.let { DetailRow(str(R.string.detail_shot), it) }
+            exif?.lens?.let { DetailRow(str(R.string.detail_lens), it) }
         }
     }
 }

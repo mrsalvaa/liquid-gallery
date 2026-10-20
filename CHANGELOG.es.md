@@ -1,5 +1,11 @@
 # Registro de cambios
 
+## 0.5.0
+
+- La app sigue el idioma del teléfono: español si el móvil está en español, inglés en el resto.
+- Fechas, meses y horas con el formato del idioma del teléfono.
+- La búsqueda entiende las palabras del idioma de la app («vídeo», «captura», «favorito»…).
+
 ## 0.3.2
 
 - Arreglado: deslizar varias veces seguidas hacia la última pestaña podía dejar la app sin responder.

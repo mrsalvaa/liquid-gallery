@@ -1,4 +1,303 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Gallery</string>
+
+    <!-- Pestañas y secciones -->
+    <string name="tab_photos">Pictures</string>
+    <string name="tab_albums">Albums</string>
+    <string name="more">More</string>
+    <string name="favorites">Favorites</string>
+    <string name="videos">Videos</string>
+    <string name="trash">Trash</string>
+    <string name="archive">Archive</string>
+    <string name="hidden">Hidden</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search</string>
+
+    <!-- Comunes -->
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="save">Save</string>
+    <string name="share">Share</string>
+    <string name="favorite">Favorite</string>
+    <string name="delete">Delete</string>
+    <string name="restore">Restore</string>
+    <string name="unhide">Unhide</string>
+    <string name="edit">Edit</string>
+    <string name="select">Select</string>
+    <string name="all">All</string>
+    <string name="loading">Loading…</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_short">%d d</string>
+    <string name="rename">Rename</string>
+    <string name="file">File</string>
+
+    <!-- Cantidades -->
+    <plurals name="items">
+        <item quantity="one">%s item</item>
+        <item quantity="other">%s items</item>
+    </plurals>
+    <plurals name="albums">
+        <item quantity="one">%s album</item>
+        <item quantity="other">%s albums</item>
+    </plurals>
+    <plurals name="results">
+        <item quantity="one">%s result</item>
+        <item quantity="other">%s results</item>
+    </plurals>
+    <plurals name="selected">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
+    <string name="select_items">Select items</string>
+
+    <!-- Avisos -->
+    <plurals name="toast_trashed">
+        <item quantity="one">Moved to trash</item>
+        <item quantity="other">%d items moved to trash</item>
+    </plurals>
+    <plurals name="toast_restored">
+        <item quantity="one">Restored</item>
+        <item quantity="other">%d items restored</item>
+    </plurals>
+    <plurals name="toast_deleted">
+        <item quantity="one">Deleted</item>
+        <item quantity="other">%d items deleted</item>
+    </plurals>
+    <string name="toast_copy_failed">Couldn\'t copy</string>
+    <string name="toast_move_failed">Couldn\'t move</string>
+    <string name="toast_copied">Copied %d</string>
+    <string name="toast_moved">Moved %d</string>
+    <plurals name="toast_archived">
+        <item quantity="one">Archived</item>
+        <item quantity="other">%d items archived</item>
+    </plurals>
+    <plurals name="toast_unarchived">
+        <item quantity="one">No longer archived</item>
+        <item quantity="other">%d items unarchived</item>
+    </plurals>
+    <string name="toast_hiding">Hiding…</string>
+    <plurals name="toast_hidden">
+        <item quantity="one">Moved to Hidden</item>
+        <item quantity="other">%d items moved to Hidden</item>
+    </plurals>
+    <string name="toast_nothing_hidden">Nothing was hidden</string>
+    <plurals name="toast_unhidden">
+        <item quantity="one">Restored to its album</item>
+        <item quantity="other">%d items restored</item>
+    </plurals>
+    <string name="toast_rename_failed">Couldn\'t rename</string>
+    <string name="toast_saved">Saved</string>
+    <string name="toast_saved_copy">Saved as a copy</string>
+    <string name="toast_save_failed">Couldn\'t save</string>
+
+    <!-- Selección y hojas -->
+    <string name="move_to_album">Move to album</string>
+    <string name="copy_to_album">Copy to album</string>
+    <string name="do_archive">Archive</string>
+    <string name="unarchive">Unarchive</string>
+    <string name="hide">Hide</string>
+    <string name="hide_subtitle">Hiding moves it to the private vault, protected by your fingerprint or PIN</string>
+    <string name="delete_named">Delete “%s”?</string>
+    <string name="move_n_to_trash">Move %s to trash</string>
+    <string name="trash_recover_hint">You can recover them from the trash for 30 days.</string>
+    <string name="delete_forever_q">Delete forever?</string>
+    <string name="delete_n">Delete %s</string>
+    <string name="hidden_no_trash">Hidden items skip the trash: this can\'t be undone.</string>
+
+    <!-- Imágenes -->
+    <string name="no_media_title">No photos or videos</string>
+    <string name="no_media_subtitle">Photos you take or download will show up here.</string>
+
+    <!-- Colecciones -->
+    <string name="trash_subtitle">Deleted forever after 30 days</string>
+    <string name="vault_subtitle">Only you can see this · %s</string>
+    <string name="archive_subtitle">Not shown in Pictures · %s</string>
+    <string name="empty_trash">Empty trash</string>
+    <string name="empty_trash_q">Empty the trash?</string>
+    <string name="delete_n_forever">Delete %s forever</string>
+    <string name="restore_all">Restore all</string>
+    <string name="cant_undo">This can\'t be undone.</string>
+    <string name="hide_album">Hide album</string>
+    <string name="delete_album">Delete album</string>
+    <string name="unfavorite_all">Remove all from favorites</string>
+    <string name="unhide_all">Unhide all</string>
+    <string name="lock_now">Lock now</string>
+    <string name="vault_warning">Hidden items are stored inside the app. If you uninstall it without unhiding them first, they\'re lost.</string>
+    <string name="trash_empty_title">The trash is empty</string>
+    <string name="trash_empty_subtitle">Things you delete stay here for 30 days.</string>
+    <string name="favorites_empty_title">No favorites</string>
+    <string name="favorites_empty_subtitle">Tap the heart when viewing a photo.</string>
+    <string name="archive_empty_title">Nothing archived</string>
+    <string name="archive_empty_subtitle">Archive screenshots or memes to remove them from Pictures.</string>
+    <string name="vault_empty_title">Nothing hidden</string>
+    <string name="vault_empty_subtitle">Select photos and choose More → Hide.</string>
+    <string name="album_empty_title">Empty album</string>
+    <string name="album_empty_subtitle">Move or copy photos to this album.</string>
+
+    <!-- Oculto -->
+    <string name="vault_locked">Hidden is locked</string>
+    <string name="vault_unlock_hint">Use your fingerprint, face or phone PIN.</string>
+    <string name="unlock">Unlock</string>
+    <string name="vault_prompt_subtitle">Unlock to see hidden items</string>
+    <string name="vault_no_lock">Set up a screen lock (PIN, pattern or fingerprint) in Android settings to use Hidden.</string>
+    <string name="vault_unsupported">This phone can\'t unlock with a fingerprint or PIN.</string>
+    <string name="restored_folder">Restored</string>
+
+    <!-- Álbumes -->
+    <string name="new_album">New album</string>
+    <string name="album_name">Album name</string>
+    <string name="new_album_hint">Created in Pictures/</string>
+    <string name="new_group">New group</string>
+    <string name="group_name">Group name</string>
+    <string name="new_group_hint">Long-press an album to add it</string>
+    <string name="album">Album</string>
+    <string name="album_group">Album group</string>
+    <string name="sort_by_ellipsis">Sort by…</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sort_custom">Custom</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_count">Number of items</string>
+    <string name="sort_recent">Most recent</string>
+    <string name="reorder">Reorder</string>
+    <string name="remove_from_group">Remove from group</string>
+    <string name="add_to_group">Add to “%s”</string>
+    <string name="ungroup">Ungroup</string>
+    <string name="ungroup_hint">Ungrouping doesn\'t delete the albums</string>
+    <string name="group">Group</string>
+    <string name="group_empty_title">Empty group</string>
+    <string name="group_empty_subtitle">Long-press an album and choose “Add to…”.</string>
+    <string name="copy_to">Copy to</string>
+    <string name="move_to">Move to</string>
+    <string name="copy">Copy</string>
+    <string name="move">Move</string>
+    <string name="drag_handle_hint">Drag by the handle</string>
+    <string name="camera_first">Camera always comes first</string>
+    <string name="drag">Drag</string>
+    <string name="order_saved_on_back">The order is saved when you go back.</string>
+    <string name="by_name">By name</string>
+    <string name="by_count">By count</string>
+    <string name="album_camera">Camera</string>
+    <string name="album_screenshots">Screenshots</string>
+    <string name="album_screen_recordings">Screen recordings</string>
+    <string name="album_downloads">Downloads</string>
+    <string name="album_whatsapp_video">WhatsApp Video</string>
+
+    <!-- Visor -->
+    <plurals name="deleted_in_days">
+        <item quantity="one">Will be deleted in %d day</item>
+        <item quantity="other">Will be deleted in %d days</item>
+    </plurals>
+    <string name="play">Play</string>
+    <string name="sound">Sound</string>
+    <string name="details">Details</string>
+    <string name="use_as">Use as…</string>
+    <string name="open_with">Open with…</string>
+    <string name="detail_name">Name</string>
+    <string name="detail_location">Location</string>
+    <string name="detail_video">Video</string>
+    <string name="detail_image">Image</string>
+    <string name="detail_camera">Camera</string>
+    <string name="detail_shot">Exposure</string>
+    <string name="detail_lens">Lens</string>
+
+    <!-- Editor -->
+    <string name="filter_original">Original</string>
+    <string name="filter_vivid">Vivid</string>
+    <string name="filter_warm">Warm</string>
+    <string name="filter_cool">Cool</string>
+    <string name="filter_bw">B&amp;W</string>
+    <string name="filter_noir">Noir</string>
+    <string name="filter_sepia">Sepia</string>
+    <string name="filter_faded">Faded</string>
+    <string name="filter_dramatic">Dramatic</string>
+    <string name="ratio_free">Free</string>
+    <string name="discard_changes_q">Discard changes?</string>
+    <string name="discard">Discard</string>
+    <string name="reset">Reset</string>
+    <string name="save_copy">Save as copy</string>
+    <string name="overwrite_original">Overwrite original</string>
+    <string name="rotate">Rotate</string>
+    <string name="flip">Flip</string>
+    <string name="brightness">Brightness</string>
+    <string name="contrast">Contrast</string>
+    <string name="saturation">Saturation</string>
+    <string name="warmth">Warmth</string>
+    <string name="crop">Crop</string>
+    <string name="adjust">Adjust</string>
+    <string name="filters">Filters</string>
+    <string name="edited_suffix">_edited</string>
+
+    <!-- Más -->
+    <string name="permission_title">Your photos and videos</string>
+    <string name="permission_text">%s needs permission to show them. It has no internet access: nothing leaves your phone.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="allow_access">Allow access</string>
+    <string name="limited_access">Limited access</string>
+    <string name="limited_access_text">You only see the photos you picked. Allow access to all of them to use the full gallery.</string>
+    <string name="allow_all">Allow all</string>
+    <string name="fewer_prompts">Fewer confirmations</string>
+    <string name="fewer_prompts_text">Android asks for confirmation every time you delete, move or favorite something. With the “Manage media” permission it happens instantly.</string>
+    <string name="allow">Allow</string>
+    <string name="about_short">Free software (GPL-3.0). No internet, no ads and no tracking: your photos never leave your phone.</string>
+
+    <!-- Ajustes -->
+    <string name="appearance">Appearance</string>
+    <string name="grid">Grid</string>
+    <string name="grid_columns">Columns in Pictures</string>
+    <string name="grid_columns_hint">You can also pinch the grid. With 6 or 8 columns it groups by month.</string>
+    <string name="start_muted">Start muted</string>
+    <string name="loop_videos">Repeat when finished</string>
+    <string name="permissions">Permissions</string>
+    <string name="manage_media">Manage media</string>
+    <string name="manage_media_on">Allowed: no confirmations when deleting or moving</string>
+    <string name="manage_media_off">Not allowed: Android will ask for confirmation</string>
+    <string name="about">About</string>
+    <string name="version">Version %s</string>
+    <string name="about_text">Free software under the GPL-3.0 license. It doesn\'t request internet access and has no ads or tracking. The trash and favorites are Android\'s own, so they\'re shared with other galleries.</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="background">Background</string>
+    <string name="background_moving">Moving</string>
+    <string name="background_accent">Accent color</string>
+    <string name="animated_background">Animated background</string>
+    <string name="animated_background_hint">Turn it off to save battery</string>
+    <string name="tone">Shade</string>
+    <string name="tone_light">Light</string>
+    <string name="tone_medium">Medium</string>
+    <string name="tone_dark">Dark</string>
+    <string name="app_icon">App icon</string>
+    <string name="app_icon_hint">The launcher may take a few seconds to show the new icon, and you might have to add it to the home screen again.</string>
+    <string name="colors_sky_pink">Sky and pink</string>
+    <string name="colors_aurora">Aurora</string>
+    <string name="colors_sunset">Sunset</string>
+    <string name="colors_ocean">Ocean</string>
+    <string name="hue_red">Red</string>
+    <string name="hue_orange">Orange</string>
+    <string name="hue_yellow">Yellow</string>
+    <string name="hue_green">Green</string>
+    <string name="hue_mint">Mint</string>
+    <string name="hue_sky">Sky blue</string>
+    <string name="hue_blue">Blue</string>
+    <string name="hue_violet">Violet</string>
+    <string name="hue_pink">Pink</string>
+    <string name="hue_gray">Gray</string>
+
+    <!-- Búsqueda -->
+    <string name="search_hint">Name, album, date, “video”…</string>
+    <string name="search_suggest_screenshots">Screenshots</string>
+    <string name="no_results">No results</string>
+    <string name="no_results_hint">Try another word.</string>
+    <string name="search_offline">Search runs on your phone, offline.</string>
+    <!-- Palabras que encuentran cada tipo al buscar -->
+    <string name="kw_video">video videos movie</string>
+    <string name="kw_photo">photo photos image images picture pictures</string>
+    <string name="kw_gif">gif animated</string>
+    <string name="kw_screenshot">screenshot screenshots screen capture</string>
+    <string name="kw_favorite">favorite favorites favourite</string>
 </resources>

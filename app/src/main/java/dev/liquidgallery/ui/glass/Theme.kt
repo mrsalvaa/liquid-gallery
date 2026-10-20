@@ -44,6 +44,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
+import dev.liquidgallery.R
 
 @Immutable
 data class GlassPalette(
@@ -100,7 +101,7 @@ val LightGlass = GlassPalette(
 
 /** Set de colores del fondo; cada uno trae su color de acento. */
 data class ColorSet(
-    val name: String,
+    val name: Int,
     val darkBlobs: List<Color>,
     val lightBlobs: List<Color>,
     val darkAccent: Color,
@@ -109,28 +110,28 @@ data class ColorSet(
 
 val COLOR_SETS = listOf(
     ColorSet(
-        "Celeste y rosa",
+        R.string.colors_sky_pink,
         darkBlobs = listOf(Color(0xFF38BDF8), Color(0xFFF472B6), Color(0xFF0E7490), Color(0xFF9D174D)),
         lightBlobs = listOf(Color(0xFFA5DCFB), Color(0xFFFBC4DE), Color(0xFF7CC8EE), Color(0xFFF5A3C7)),
         darkAccent = Color(0xFF7CC8FF),
         lightAccent = Color(0xFF1C7ED6),
     ),
     ColorSet(
-        "Aurora",
+        R.string.colors_aurora,
         darkBlobs = listOf(Color(0xFF34D399), Color(0xFF8B5CF6), Color(0xFF0F766E), Color(0xFF5B21B6)),
         lightBlobs = listOf(Color(0xFFA7F3D0), Color(0xFFDDD6FE), Color(0xFF99F6E4), Color(0xFFC4B5FD)),
         darkAccent = Color(0xFF6EE7B7),
         lightAccent = Color(0xFF0D9488),
     ),
     ColorSet(
-        "Atardecer",
+        R.string.colors_sunset,
         darkBlobs = listOf(Color(0xFFFB923C), Color(0xFFE879F9), Color(0xFF9A3412), Color(0xFF86198F)),
         lightBlobs = listOf(Color(0xFFFED7AA), Color(0xFFF5D0FE), Color(0xFFFDBA74), Color(0xFFF0ABFC)),
         darkAccent = Color(0xFFFDBA74),
         lightAccent = Color(0xFFC2410C),
     ),
     ColorSet(
-        "Océano",
+        R.string.colors_ocean,
         darkBlobs = listOf(Color(0xFF3B82F6), Color(0xFF2DD4BF), Color(0xFF1E3A8A), Color(0xFF115E59)),
         lightBlobs = listOf(Color(0xFFBFDBFE), Color(0xFF99F6E4), Color(0xFF93C5FD), Color(0xFF5EEAD4)),
         darkAccent = Color(0xFF93C5FD),
@@ -139,19 +140,19 @@ val COLOR_SETS = listOf(
 )
 
 /** Colores de énfasis: cada uno con tres tonos (claro, medio, oscuro). */
-data class AccentHue(val name: String, val tones: List<Color>)
+data class AccentHue(val name: Int, val tones: List<Color>)
 
 val ACCENT_HUES = listOf(
-    AccentHue("Rojo", listOf(Color(0xFFFCA5A5), Color(0xFFEF4444), Color(0xFFB91C1C))),
-    AccentHue("Naranja", listOf(Color(0xFFFDBA74), Color(0xFFF97316), Color(0xFFC2410C))),
-    AccentHue("Amarillo", listOf(Color(0xFFFDE68A), Color(0xFFFACC15), Color(0xFFCA8A04))),
-    AccentHue("Verde", listOf(Color(0xFF86EFAC), Color(0xFF22C55E), Color(0xFF15803D))),
-    AccentHue("Menta", listOf(Color(0xFF5EEAD4), Color(0xFF14B8A6), Color(0xFF0F766E))),
-    AccentHue("Celeste", listOf(Color(0xFF7DD3FC), Color(0xFF0EA5E9), Color(0xFF0369A1))),
-    AccentHue("Azul", listOf(Color(0xFF93C5FD), Color(0xFF3B82F6), Color(0xFF1D4ED8))),
-    AccentHue("Violeta", listOf(Color(0xFFC4B5FD), Color(0xFF8B5CF6), Color(0xFF6D28D9))),
-    AccentHue("Rosa", listOf(Color(0xFFF9A8D4), Color(0xFFEC4899), Color(0xFFBE185D))),
-    AccentHue("Gris", listOf(Color(0xFFE5E7EB), Color(0xFF9CA3AF), Color(0xFF4B5563))),
+    AccentHue(R.string.hue_red, listOf(Color(0xFFFCA5A5), Color(0xFFEF4444), Color(0xFFB91C1C))),
+    AccentHue(R.string.hue_orange, listOf(Color(0xFFFDBA74), Color(0xFFF97316), Color(0xFFC2410C))),
+    AccentHue(R.string.hue_yellow, listOf(Color(0xFFFDE68A), Color(0xFFFACC15), Color(0xFFCA8A04))),
+    AccentHue(R.string.hue_green, listOf(Color(0xFF86EFAC), Color(0xFF22C55E), Color(0xFF15803D))),
+    AccentHue(R.string.hue_mint, listOf(Color(0xFF5EEAD4), Color(0xFF14B8A6), Color(0xFF0F766E))),
+    AccentHue(R.string.hue_sky, listOf(Color(0xFF7DD3FC), Color(0xFF0EA5E9), Color(0xFF0369A1))),
+    AccentHue(R.string.hue_blue, listOf(Color(0xFF93C5FD), Color(0xFF3B82F6), Color(0xFF1D4ED8))),
+    AccentHue(R.string.hue_violet, listOf(Color(0xFFC4B5FD), Color(0xFF8B5CF6), Color(0xFF6D28D9))),
+    AccentHue(R.string.hue_pink, listOf(Color(0xFFF9A8D4), Color(0xFFEC4899), Color(0xFFBE185D))),
+    AccentHue(R.string.hue_gray, listOf(Color(0xFFE5E7EB), Color(0xFF9CA3AF), Color(0xFF4B5563))),
 )
 
 /**

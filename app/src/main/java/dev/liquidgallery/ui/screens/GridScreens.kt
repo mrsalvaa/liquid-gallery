@@ -66,6 +66,8 @@ import dev.liquidgallery.ui.glass.SheetAction
 import dev.liquidgallery.ui.glass.SheetSpec
 import dev.liquidgallery.util.countLabel
 import java.util.concurrent.TimeUnit
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 /** Acciones de la barra de selección en las cuadrículas normales. */
 @Composable
@@ -79,14 +81,14 @@ fun standardSelectionBar(selection: Selection, items: List<Media>): SelectionBar
             all = { current },
             actions = {
                 listOf(
-                    SelectionAction("Compartir", Icons.Rounded.Share) { actions.share(it) },
-                    SelectionAction("Favorito", Icons.Rounded.FavoriteBorder) { sel ->
+                    SelectionAction(str(R.string.share), Icons.Rounded.Share) { actions.share(it) },
+                    SelectionAction(str(R.string.favorite), Icons.Rounded.FavoriteBorder) { sel ->
                         actions.favorite(sel, !sel.all { it.favorite }) { selection.clear() }
                     },
-                    SelectionAction("Eliminar", Icons.Rounded.Delete, danger = true) { sel ->
+                    SelectionAction(str(R.string.delete), Icons.Rounded.Delete, danger = true) { sel ->
                         actions.trash(sel) { selection.clear() }
                     },
-                    SelectionAction("Más", Icons.Rounded.MoreHoriz) { sel ->
+                    SelectionAction(str(R.string.more), Icons.Rounded.MoreHoriz) { sel ->
                         sheet(moreSelectionSheet(sel, actions) { selection.clear() })
                     },
                 )
@@ -102,16 +104,16 @@ fun moreSelectionSheet(sel: List<Media>, actions: GalleryActions, done: () -> Un
     return SheetSpec(
         countLabel(sel.size),
         listOf(
-            SheetAction("Mover a un álbum", Icons.AutoMirrored.Rounded.DriveFileMove) { actions.pickAlbum(sel, false) },
-            SheetAction("Copiar a un álbum", Icons.Rounded.ContentCopy) { actions.pickAlbum(sel, true) },
+            SheetAction(str(R.string.move_to_album), Icons.AutoMirrored.Rounded.DriveFileMove) { actions.pickAlbum(sel, false) },
+            SheetAction(str(R.string.copy_to_album), Icons.Rounded.ContentCopy) { actions.pickAlbum(sel, true) },
             if (allArchived) {
-                SheetAction("Desarchivar", Icons.Rounded.Unarchive) { actions.archive(sel, false, done) }
+                SheetAction(str(R.string.unarchive), Icons.Rounded.Unarchive) { actions.archive(sel, false, done) }
             } else {
-                SheetAction("Archivar", Icons.Rounded.Archive) { actions.archive(sel, true, done) }
+                SheetAction(str(R.string.do_archive), Icons.Rounded.Archive) { actions.archive(sel, true, done) }
             },
-            SheetAction("Ocultar", Icons.Rounded.VisibilityOff) { actions.hide(sel, done) },
+            SheetAction(str(R.string.hide), Icons.Rounded.VisibilityOff) { actions.hide(sel, done) },
         ),
-        subtitle = "Ocultar lo mueve a la bóveda privada, protegida con tu huella o PIN",
+        subtitle = str(R.string.hide_subtitle),
     )
 }
 
@@ -146,18 +148,18 @@ fun PhotosScreen(
     ) {
         item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
             ScreenTitle(
-                "Imágenes",
+                str(R.string.tab_photos),
                 Modifier.padding(horizontal = 14.dp),
-                subtitle = if (loaded) countLabel(items.size) else "Cargando…",
+                subtitle = if (loaded) countLabel(items.size) else str(R.string.loading),
             ) {
-                GlassIconButton(Icons.Rounded.Search, "Buscar", onSearch)
-                GlassIconButton(Icons.Rounded.MoreVert, "Más", {
+                GlassIconButton(Icons.Rounded.Search, str(R.string.search), onSearch)
+                GlassIconButton(Icons.Rounded.MoreVert, str(R.string.more), {
                     sheet(
                         SheetSpec(
-                            "Imágenes",
+                            str(R.string.tab_photos),
                             listOf(
-                                SheetAction("Seleccionar", Icons.Rounded.CheckCircle) { selection.active = true },
-                                SheetAction("Ajustes", Icons.Rounded.Settings, onClick = onSettings),
+                                SheetAction(str(R.string.select), Icons.Rounded.CheckCircle) { selection.active = true },
+                                SheetAction(str(R.string.settings), Icons.Rounded.Settings, onClick = onSettings),
                             ),
                         ),
                     )
@@ -166,7 +168,7 @@ fun PhotosScreen(
         }
         if (loaded && items.isEmpty()) {
             item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
-                EmptyState("No hay fotos ni vídeos", "Las fotos que hagas o descargues aparecerán aquí.")
+                EmptyState(str(R.string.no_media_title), str(R.string.no_media_subtitle))
             }
         }
     }
@@ -174,23 +176,23 @@ fun PhotosScreen(
 
 /** Confirmación antes de mandar un álbum entero a la papelera. */
 fun deleteAlbumSheet(name: String, items: List<Media>, actions: GalleryActions, after: () -> Unit = {}) = SheetSpec(
-    "¿Eliminar «$name»?",
+    str(R.string.delete_named, name),
     listOf(
-        SheetAction("Mover ${countLabel(items.size)} a la papelera", Icons.Rounded.Delete, danger = true) {
+        SheetAction(str(R.string.move_n_to_trash, countLabel(items.size)), Icons.Rounded.Delete, danger = true) {
             actions.trash(items, after)
         },
     ),
-    subtitle = "Podrás recuperarlos desde la papelera durante 30 días.",
+    subtitle = str(R.string.trash_recover_hint),
 )
 
 fun deleteHiddenSheet(sel: List<Media>, actions: GalleryActions, after: () -> Unit) = SheetSpec(
-    "¿Eliminar para siempre?",
+    str(R.string.delete_forever_q),
     listOf(
-        SheetAction("Eliminar ${countLabel(sel.size)}", Icons.Rounded.DeleteForever, danger = true) {
+        SheetAction(str(R.string.delete_n, countLabel(sel.size)), Icons.Rounded.DeleteForever, danger = true) {
             actions.deleteHidden(sel, after)
         },
     ),
-    subtitle = "Lo oculto no pasa por la papelera: no se puede deshacer.",
+    subtitle = str(R.string.hidden_no_trash),
 )
 
 /** Cuadrícula de un álbum, favoritos, vídeos, archivo, papelera u oculto. */
@@ -216,12 +218,12 @@ fun SourceGridScreen(
     val isVault = source == Source.Vault
     val title = when (source) {
         is Source.Album -> items.firstOrNull()?.albumName ?: albumName(source.path, null)
-        Source.Favorites -> "Favoritos"
-        Source.Videos -> "Vídeos"
-        Source.Trash -> "Papelera"
-        Source.Archive -> "Archivo"
-        Source.Vault -> "Oculto"
-        Source.All -> "Imágenes"
+        Source.Favorites -> str(R.string.favorites)
+        Source.Videos -> str(R.string.videos)
+        Source.Trash -> str(R.string.trash)
+        Source.Archive -> str(R.string.archive)
+        Source.Vault -> str(R.string.hidden)
+        Source.All -> str(R.string.tab_photos)
         is Source.Search -> source.query
     }
 
@@ -238,8 +240,8 @@ fun SourceGridScreen(
                 all = { current },
                 actions = {
                     listOf(
-                        SelectionAction("Restaurar", Icons.Rounded.Restore) { actions.restore(it) { selection.clear() } },
-                        SelectionAction("Eliminar", Icons.Rounded.DeleteForever, danger = true) {
+                        SelectionAction(str(R.string.restore), Icons.Rounded.Restore) { actions.restore(it) { selection.clear() } },
+                        SelectionAction(str(R.string.delete), Icons.Rounded.DeleteForever, danger = true) {
                             actions.deleteForever(it) { selection.clear() }
                         },
                     )
@@ -252,9 +254,9 @@ fun SourceGridScreen(
                 all = { current },
                 actions = {
                     listOf(
-                        SelectionAction("Mostrar", Icons.Rounded.Visibility) { actions.unhide(it) { selection.clear() } },
-                        SelectionAction("Compartir", Icons.Rounded.Share) { actions.share(it) },
-                        SelectionAction("Eliminar", Icons.Rounded.DeleteForever, danger = true) { sel ->
+                        SelectionAction(str(R.string.unhide), Icons.Rounded.Visibility) { actions.unhide(it) { selection.clear() } },
+                        SelectionAction(str(R.string.share), Icons.Rounded.Share) { actions.share(it) },
+                        SelectionAction(str(R.string.delete), Icons.Rounded.DeleteForever, danger = true) { sel ->
                             sheet(deleteHiddenSheet(sel, actions) { selection.clear() })
                         },
                     )
@@ -286,39 +288,39 @@ fun SourceGridScreen(
                 onBack,
                 Modifier.padding(horizontal = 14.dp),
                 subtitle = when {
-                    isTrash -> "Se eliminan para siempre a los 30 días"
-                    isVault -> "Solo tú puedes verlo · ${countLabel(items.size)}"
-                    source == Source.Archive -> "No salen en Imágenes · ${countLabel(items.size)}"
+                    isTrash -> str(R.string.trash_subtitle)
+                    isVault -> str(R.string.vault_subtitle, countLabel(items.size))
+                    source == Source.Archive -> str(R.string.archive_subtitle, countLabel(items.size))
                     else -> countLabel(items.size)
                 },
             ) {
                 if (isTrash) {
                     if (items.isNotEmpty()) {
-                        GlassIconButton(Icons.Rounded.DeleteSweep, "Vaciar papelera", {
+                        GlassIconButton(Icons.Rounded.DeleteSweep, str(R.string.empty_trash), {
                             sheet(
                                 SheetSpec(
-                                    "¿Vaciar la papelera?",
+                                    str(R.string.empty_trash_q),
                                     listOf(
-                                        SheetAction("Eliminar ${countLabel(items.size)} para siempre", Icons.Rounded.DeleteForever, danger = true) {
+                                        SheetAction(str(R.string.delete_n_forever, countLabel(items.size)), Icons.Rounded.DeleteForever, danger = true) {
                                             actions.deleteForever(items)
                                         },
-                                        SheetAction("Restaurar todo", Icons.Rounded.Restore) { actions.restore(items) },
+                                        SheetAction(str(R.string.restore_all), Icons.Rounded.Restore) { actions.restore(items) },
                                     ),
-                                    subtitle = "No se puede deshacer.",
+                                    subtitle = str(R.string.cant_undo),
                                 ),
                             )
                         })
                     }
                 } else {
-                    GlassIconButton(Icons.Rounded.MoreVert, "Más", {
+                    GlassIconButton(Icons.Rounded.MoreVert, str(R.string.more), {
                         val list = buildList {
-                            add(SheetAction("Seleccionar", Icons.Rounded.CheckCircle) { selection.active = true })
+                            add(SheetAction(str(R.string.select), Icons.Rounded.CheckCircle) { selection.active = true })
                             if (source is Source.Album) {
                                 if (items.isNotEmpty()) {
-                                    add(SheetAction("Ocultar álbum", Icons.Rounded.VisibilityOff) { actions.hide(items) { onBack() } })
+                                    add(SheetAction(str(R.string.hide_album), Icons.Rounded.VisibilityOff) { actions.hide(items) { onBack() } })
                                 }
                                 add(
-                                    SheetAction("Eliminar álbum", Icons.Rounded.Delete, danger = true) {
+                                    SheetAction(str(R.string.delete_album), Icons.Rounded.Delete, danger = true) {
                                         if (items.isEmpty()) {
                                             Stores.albums.update { it.copy(empty = it.empty - source.path) }
                                             onBack()
@@ -329,13 +331,13 @@ fun SourceGridScreen(
                                 )
                             }
                             if (source == Source.Favorites && items.isNotEmpty()) {
-                                add(SheetAction("Quitar todos de favoritos", Icons.Rounded.Favorite) { actions.favorite(items, false) })
+                                add(SheetAction(str(R.string.unfavorite_all), Icons.Rounded.Favorite) { actions.favorite(items, false) })
                             }
                             if (isVault && items.isNotEmpty()) {
-                                add(SheetAction("Mostrar todo", Icons.Rounded.Visibility) { actions.unhide(items) })
+                                add(SheetAction(str(R.string.unhide_all), Icons.Rounded.Visibility) { actions.unhide(items) })
                             }
                             if (isVault) {
-                                add(SheetAction("Bloquear ahora", Icons.Rounded.Lock) { VaultLock.lock() })
+                                add(SheetAction(str(R.string.lock_now), Icons.Rounded.Lock) { VaultLock.lock() })
                             }
                         }
                         sheet(SheetSpec(title, list))
@@ -346,7 +348,7 @@ fun SourceGridScreen(
         if (isVault) {
             item(key = "warning", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    "Lo oculto se guarda dentro de la app. Si la desinstalas sin mostrarlo antes, se pierde.",
+                    str(R.string.vault_warning),
                     Modifier.padding(horizontal = 18.dp, vertical = 4.dp),
                     fontSize = 13.sp,
                     color = LocalGlass.current.contentSecondary,
@@ -356,11 +358,11 @@ fun SourceGridScreen(
         if (items.isEmpty()) {
             item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
                 when (source) {
-                    Source.Trash -> EmptyState("La papelera está vacía", "Lo que elimines se queda aquí 30 días.")
-                    Source.Favorites -> EmptyState("Sin favoritos", "Toca el corazón al ver una foto.")
-                    Source.Archive -> EmptyState("Nada archivado", "Archiva capturas o memes para quitarlos de Imágenes.")
-                    Source.Vault -> EmptyState("Nada oculto", "Selecciona fotos y elige Más → Ocultar.")
-                    else -> EmptyState("Álbum vacío", "Mueve o copia fotos a este álbum.")
+                    Source.Trash -> EmptyState(str(R.string.trash_empty_title), str(R.string.trash_empty_subtitle))
+                    Source.Favorites -> EmptyState(str(R.string.favorites_empty_title), str(R.string.favorites_empty_subtitle))
+                    Source.Archive -> EmptyState(str(R.string.archive_empty_title), str(R.string.archive_empty_subtitle))
+                    Source.Vault -> EmptyState(str(R.string.vault_empty_title), str(R.string.vault_empty_subtitle))
+                    else -> EmptyState(str(R.string.album_empty_title), str(R.string.album_empty_subtitle))
                 }
             }
         }
@@ -378,21 +380,21 @@ fun VaultLocked(padding: PaddingValues, onBack: () -> Unit) {
         if (activity != null) VaultLock.unlock(activity) { _, reason -> error = reason }
     }
     Column(Modifier.padding(padding).padding(horizontal = 16.dp)) {
-        BackTitle("Oculto", onBack)
+        BackTitle(str(R.string.hidden), onBack)
         Box(Modifier.fillMaxWidth().padding(top = 60.dp)) {
             GlassCard {
                 Icon(Icons.Rounded.Lock, null, Modifier.size(44.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
                 Text(
-                    "Oculto está bloqueado",
+                    str(R.string.vault_locked),
                     Modifier.fillMaxWidth().padding(top = 12.dp),
                     fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
                 )
                 Text(
-                    error ?: "Usa tu huella, cara o el PIN del móvil.",
+                    error ?: str(R.string.vault_unlock_hint),
                     Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 18.dp),
                     fontSize = 14.sp, color = p.contentSecondary, textAlign = TextAlign.Center,
                 )
-                GlassButton("Desbloquear", {
+                GlassButton(str(R.string.unlock), {
                     if (activity != null) VaultLock.unlock(activity) { _, reason -> error = reason }
                 }, Modifier.fillMaxWidth(), prominent = true)
             }
@@ -405,7 +407,7 @@ private fun TrashBadge(m: Media) {
     val days = TimeUnit.MILLISECONDS.toDays((m.expires - System.currentTimeMillis()).coerceAtLeast(0)).toInt()
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
         Text(
-            if (days <= 0) "Hoy" else "$days d",
+            if (days <= 0) str(R.string.today) else str(R.string.days_short, days),
             Modifier
                 .padding(5.dp)
                 .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(8.dp))

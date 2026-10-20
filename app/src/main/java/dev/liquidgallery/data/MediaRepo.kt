@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 @Immutable
 data class Media(
@@ -58,12 +60,12 @@ data class Album(
 fun albumName(path: String, bucket: String?): String {
     val p = path.trimEnd('/').lowercase()
     return when {
-        p == "dcim/camera" -> "Cámara"
-        p.endsWith("/screenshots") -> "Capturas de pantalla"
-        p.endsWith("/screen recordings") || p.endsWith("/screenrecorder") -> "Grabaciones de pantalla"
-        p == "download" -> "Descargas"
+        p == "dcim/camera" -> str(R.string.album_camera)
+        p.endsWith("/screenshots") -> str(R.string.album_screenshots)
+        p.endsWith("/screen recordings") || p.endsWith("/screenrecorder") -> str(R.string.album_screen_recordings)
+        p == "download" -> str(R.string.album_downloads)
         p.endsWith("whatsapp images") -> "WhatsApp"
-        p.endsWith("whatsapp video") -> "WhatsApp Vídeo"
+        p.endsWith("whatsapp video") -> str(R.string.album_whatsapp_video)
         else -> bucket ?: path.trimEnd('/').substringAfterLast('/').ifEmpty { path }
     }
 }

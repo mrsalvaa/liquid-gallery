@@ -54,6 +54,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.Normalizer
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
+import dev.liquidgallery.util.plural
 
 /** De dónde salen los elementos de una cuadrícula o del visor. */
 sealed interface Source {
@@ -100,10 +103,10 @@ fun search(media: List<Media>, query: String): List<Media> {
         val hay = buildString {
             append(m.name).append(' ').append(m.albumName).append(' ').append(m.album).append(' ')
             append(dayLabel(day)).append(' ').append(monthLabel(day)).append(' ').append(day.year).append(' ')
-            append(if (m.isVideo) "video videos " else "foto fotos imagen imagenes ")
-            if (m.isGif) append("gif animado ")
-            if (m.album.contains("screenshot", true)) append("captura capturas pantalla ")
-            if (m.favorite) append("favorito favoritos ")
+            append(str(if (m.isVideo) R.string.kw_video else R.string.kw_photo)).append(' ')
+            if (m.isGif) append(str(R.string.kw_gif)).append(' ')
+            if (m.album.contains("screenshot", true)) append(str(R.string.kw_screenshot)).append(' ')
+            if (m.favorite) append(str(R.string.kw_favorite)).append(' ')
         }.fold()
         words.all { it in hay }
     }
@@ -178,7 +181,7 @@ class GalleryActions(
 
     fun trash(items: List<Media>, after: () -> Unit = {}) = scope.launch {
         if (ops.trash(items)) {
-            toast(if (items.size == 1) "Movido a la papelera" else "${items.size} elementos movidos a la papelera")
+            toast(plural(R.plurals.toast_trashed, items.size))
             after()
         }
     }
@@ -189,14 +192,14 @@ class GalleryActions(
 
     fun restore(items: List<Media>, after: () -> Unit = {}) = scope.launch {
         if (ops.restore(items)) {
-            toast(if (items.size == 1) "Restaurado" else "${items.size} elementos restaurados")
+            toast(plural(R.plurals.toast_restored, items.size))
             after()
         }
     }
 
     fun deleteForever(items: List<Media>, after: () -> Unit = {}) = scope.launch {
         if (ops.deleteForever(items)) {
-            toast(if (items.size == 1) "Eliminado" else "${items.size} elementos eliminados")
+            toast(plural(R.plurals.toast_deleted, items.size))
             after()
         }
     }
@@ -204,9 +207,9 @@ class GalleryActions(
     fun moveTo(items: List<Media>, path: String, copy: Boolean, after: () -> Unit = {}) = scope.launch {
         val n = if (copy) ops.copy(items, path) else ops.move(items, path)
         when {
-            n == 0 && items.isNotEmpty() -> toast(if (copy) "No se pudo copiar" else "No se pudo mover")
+            n == 0 && items.isNotEmpty() -> toast(str(if (copy) R.string.toast_copy_failed else R.string.toast_move_failed))
             n > 0 -> {
-                toast("${if (copy) "Copiados" else "Movidos"} $n")
+                toast(str(if (copy) R.string.toast_copied else R.string.toast_moved, n))
                 after()
             }
         }
@@ -218,10 +221,8 @@ class GalleryActions(
         Stores.albums.update { if (archive) it.copy(archived = it.archived + ids) else it.copy(archived = it.archived - ids) }
         toast(
             when {
-                archive && items.size == 1 -> "Archivado"
-                archive -> "${items.size} elementos archivados"
-                items.size == 1 -> "Ya no está archivado"
-                else -> "${items.size} elementos desarchivados"
+                archive -> plural(R.plurals.toast_archived, items.size)
+                else -> plural(R.plurals.toast_unarchived, items.size)
             },
         )
         after()
@@ -229,30 +230,30 @@ class GalleryActions(
 
     /** Ocultar: a la bóveda privada. */
     fun hide(items: List<Media>, after: () -> Unit = {}) = scope.launch {
-        toast("Ocultando…")
+        toast(str(R.string.toast_hiding))
         val n = Vault.hide(context, ops, items)
         if (n > 0) {
-            toast(if (n == 1) "Movido a Oculto" else "$n elementos movidos a Oculto")
+            toast(plural(R.plurals.toast_hidden, n))
             after()
         } else if (items.isNotEmpty()) {
-            toast("No se ocultó nada")
+            toast(str(R.string.toast_nothing_hidden))
         }
     }
 
     fun unhide(items: List<Media>, after: () -> Unit = {}) = scope.launch {
         val n = Vault.restore(context, items)
-        toast(if (n == 1) "Restaurado a su álbum" else "$n elementos restaurados")
+        toast(plural(R.plurals.toast_unhidden, n))
         if (n > 0) after()
     }
 
     fun deleteHidden(items: List<Media>, after: () -> Unit = {}) = scope.launch {
         Vault.delete(items)
-        toast(if (items.size == 1) "Eliminado" else "${items.size} elementos eliminados")
+        toast(plural(R.plurals.toast_deleted, items.size))
         after()
     }
 
     fun rename(item: Media, name: String) = scope.launch {
-        if (!ops.rename(item, name)) toast("No se pudo cambiar el nombre")
+        if (!ops.rename(item, name)) toast(str(R.string.toast_rename_failed))
     }
 
     fun launch(block: suspend CoroutineScope.() -> Unit) = scope.launch(block = block)
@@ -278,7 +279,7 @@ fun BackTitle(
         modifier.fillMaxWidth().padding(top = TitleTopPadding, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        GlassIconButton(Icons.AutoMirrored.Rounded.ArrowBack, "Atrás", onBack)
+        GlassIconButton(Icons.AutoMirrored.Rounded.ArrowBack, str(R.string.back), onBack)
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(title, fontSize = 26.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)

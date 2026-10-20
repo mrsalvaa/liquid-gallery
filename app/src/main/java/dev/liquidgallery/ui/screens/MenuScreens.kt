@@ -80,6 +80,8 @@ import dev.liquidgallery.ui.glass.SettingRow
 import dev.liquidgallery.util.countLabel
 import kotlinx.coroutines.delay
 import java.time.LocalDate
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 // --- Permisos ---
 
@@ -145,17 +147,17 @@ fun PermissionScreen(padding: PaddingValues, onChanged: () -> Unit) {
         GlassCard {
             Icon(Icons.Rounded.PhotoLibrary, null, Modifier.size(48.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
             Text(
-                "Tus fotos y vídeos",
+                str(R.string.permission_title),
                 Modifier.fillMaxWidth().padding(top = 12.dp),
                 fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
             )
             Text(
-                "Galería necesita permiso para mostrarlos. No tiene acceso a internet: nada sale de tu móvil.",
+                str(R.string.permission_text, str(R.string.app_name)),
                 Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 18.dp),
                 fontSize = 15.sp, color = p.contentSecondary, textAlign = TextAlign.Center,
             )
             GlassButton(
-                if (asked >= 2) "Abrir ajustes" else "Permitir acceso",
+                str(if (asked >= 2) R.string.open_settings else R.string.allow_access),
                 {
                     if (asked >= 2) openAppSettings(context) else launcher.launch(MEDIA_PERMISSIONS)
                 },
@@ -194,44 +196,43 @@ fun MenuScreen(
             .padding(padding)
             .padding(horizontal = 16.dp),
     ) {
-        ScreenTitle("Más")
+        ScreenTitle(str(R.string.more))
         GlassCard {
-            MenuRow(Icons.Rounded.Favorite, "Favoritos", media.count { it.favorite }.toString()) { onOpenSource(Source.Favorites) }
-            MenuRow(Icons.Rounded.PlayCircle, "Vídeos", media.count { it.isVideo }.toString()) {
+            MenuRow(Icons.Rounded.Favorite, str(R.string.favorites), media.count { it.favorite }.toString()) { onOpenSource(Source.Favorites) }
+            MenuRow(Icons.Rounded.PlayCircle, str(R.string.videos), media.count { it.isVideo }.toString()) {
                 onOpenSource(Source.Videos)
             }
-            MenuRow(Icons.Rounded.Archive, "Archivo", media.count { it.id in prefs.archived }.toString()) {
+            MenuRow(Icons.Rounded.Archive, str(R.string.archive), media.count { it.id in prefs.archived }.toString()) {
                 onOpenSource(Source.Archive)
             }
-            MenuRow(Icons.Rounded.Lock, "Oculto", null, onClick = onVault)
-            MenuRow(Icons.Rounded.Delete, "Papelera", trash.size.toString()) { onOpenSource(Source.Trash) }
+            MenuRow(Icons.Rounded.Lock, str(R.string.hidden), null, onClick = onVault)
+            MenuRow(Icons.Rounded.Delete, str(R.string.trash), trash.size.toString()) { onOpenSource(Source.Trash) }
         }
         Spacer(Modifier.height(14.dp))
         if (access == 1) {
             GlassCard {
-                Text("Acceso limitado", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                Text(str(R.string.limited_access), fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Solo ves las fotos que elegiste. Permite el acceso a todas para usar la galería completa.",
+                    str(R.string.limited_access_text),
                     Modifier.padding(top = 4.dp, bottom = 12.dp), fontSize = 14.sp, color = p.contentSecondary,
                 )
-                GlassButton("Permitir todo", { launcher.launch(MEDIA_PERMISSIONS) }, Modifier.fillMaxWidth(), prominent = true)
+                GlassButton(str(R.string.allow_all), { launcher.launch(MEDIA_PERMISSIONS) }, Modifier.fillMaxWidth(), prominent = true)
             }
             Spacer(Modifier.height(14.dp))
         }
         if (!canManage) {
             GlassCard {
-                Text("Menos confirmaciones", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                Text(str(R.string.fewer_prompts), fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Android pide confirmar cada vez que borras, mueves o marcas favoritos. Con el permiso " +
-                        "«Gestionar contenido multimedia» se hace al momento.",
+                    str(R.string.fewer_prompts_text),
                     Modifier.padding(top = 4.dp, bottom = 12.dp), fontSize = 14.sp, color = p.contentSecondary,
                 )
-                GlassButton("Permitir", { openManageMedia(context) }, Modifier.fillMaxWidth())
+                GlassButton(str(R.string.allow), { openManageMedia(context) }, Modifier.fillMaxWidth())
             }
             Spacer(Modifier.height(14.dp))
         }
         GlassCard {
-            MenuRow(Icons.Rounded.Settings, "Ajustes", null, onClick = onSettings)
+            MenuRow(Icons.Rounded.Settings, str(R.string.settings), null, onClick = onSettings)
         }
         Spacer(Modifier.height(14.dp))
         GlassCard {
@@ -239,7 +240,7 @@ fun MenuScreen(
                 Icon(Icons.Rounded.Shield, null, Modifier.size(22.dp), tint = p.accentFg)
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    "Software libre (GPL-3.0). Sin internet, sin anuncios y sin rastreo: tus fotos no salen del móvil.",
+                    str(R.string.about_short),
                     fontSize = 13.sp, color = p.contentSecondary,
                 )
             }
@@ -302,46 +303,44 @@ fun SettingsScreen(padding: PaddingValues, onBack: () -> Unit) {
             .padding(horizontal = 16.dp)
             .padding(bottom = 24.dp),
     ) {
-        BackTitle("Ajustes", onBack)
-        SectionLabel("Apariencia")
+        BackTitle(str(R.string.settings), onBack)
+        SectionLabel(str(R.string.appearance))
         AppearanceCard(s, edit)
 
-        SectionLabel("Cuadrícula")
+        SectionLabel(str(R.string.grid))
         GlassCard {
-            Text("Columnas en Imágenes", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(str(R.string.grid_columns), fontSize = 16.sp, fontWeight = FontWeight.Medium)
             ChipRow(GRID_COLUMNS, s.gridColumns, { it.toString() }) { v -> edit { it.copy(gridColumns = v) } }
             Text(
-                "También puedes pellizcar la cuadrícula. Con 6 u 8 columnas se agrupa por meses.",
+                str(R.string.grid_columns_hint),
                 fontSize = 12.sp, color = p.contentSecondary,
             )
         }
 
-        SectionLabel("Vídeos")
+        SectionLabel(str(R.string.videos))
         GlassCard {
-            SettingRow("Empezar sin sonido") {
+            SettingRow(str(R.string.start_muted)) {
                 GlassSwitch(s.videoMuted, { v -> edit { it.copy(videoMuted = v) } })
             }
-            SettingRow("Repetir al terminar") {
+            SettingRow(str(R.string.loop_videos)) {
                 GlassSwitch(s.videoLoop, { v -> edit { it.copy(videoLoop = v) } })
             }
         }
 
-        SectionLabel("Permisos")
+        SectionLabel(str(R.string.permissions))
         GlassCard {
             SettingRow(
-                "Gestionar contenido multimedia",
-                subtitle = if (canManage) "Permitido: sin confirmaciones al borrar o mover" else "Sin permitir: Android pedirá confirmación",
+                str(R.string.manage_media),
+                subtitle = str(if (canManage) R.string.manage_media_on else R.string.manage_media_off),
                 onClick = { openManageMedia(context) },
             )
         }
 
-        SectionLabel("Acerca de")
+        SectionLabel(str(R.string.about))
         GlassCard {
-            SettingRow("Liquid Gallery", subtitle = "Versión ${BuildConfig.VERSION_NAME}")
+            SettingRow("Liquid Gallery", subtitle = str(R.string.version, BuildConfig.VERSION_NAME))
             Text(
-                "Software libre bajo la licencia GPL-3.0. No pide permiso de internet, no tiene anuncios " +
-                    "ni rastreo. La papelera y los favoritos son los de Android, así que se comparten con " +
-                    "otras galerías.",
+                str(R.string.about_text),
                 fontSize = 13.sp, color = p.contentSecondary,
             )
         }
@@ -391,22 +390,22 @@ fun SearchScreen(
     ) {
         item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
             Column(Modifier.padding(horizontal = 14.dp)) {
-                BackTitle("Buscar", onBack, subtitle = if (query.isEmpty()) null else countLabel(items.size, "resultado", "resultados"))
+                BackTitle(str(R.string.search), onBack, subtitle = if (query.isEmpty()) null else countLabel(items.size, R.plurals.results))
                 GlassTextField(
-                    text, { text = it }, "Nombre, álbum, fecha, «vídeo»…",
+                    text, { text = it }, str(R.string.search_hint),
                     focusRequester = focus,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
                 )
-                val suggestions = listOf("Vídeos", "Capturas", "GIF", "Favoritos", "Ayer") +
+                val suggestions = listOf(str(R.string.videos), str(R.string.search_suggest_screenshots), "GIF", str(R.string.favorites), str(R.string.yesterday)) +
                     listOf(LocalDate.now().year.toString()) + years.map { it.toString() }
                 ChipRow(suggestions.distinct(), "", { it }, Modifier.padding(top = 8.dp)) { text = it }
                 if (query.isNotEmpty() && items.isEmpty()) {
-                    EmptyState("Sin resultados", "Prueba con otra palabra.")
+                    EmptyState(str(R.string.no_results), str(R.string.no_results_hint))
                 }
                 if (query.isEmpty()) {
                     Text(
-                        "La búsqueda se hace en el móvil, sin conexión.",
+                        str(R.string.search_offline),
                         Modifier.padding(8.dp), fontSize = 13.sp, color = p.contentSecondary,
                     )
                 }

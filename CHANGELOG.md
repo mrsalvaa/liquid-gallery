@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- The app follows the phone's language: Spanish on phones set to Spanish, English everywhere else.
+- Dates, months and times use the phone's language format.
+- Search understands the words of the app's language ("video", "screenshot", "favorite"…).
+
 ## 0.3.2
 
 - Fixed: swiping several times in a row towards the last tab could leave the app unresponsive.

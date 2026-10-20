@@ -98,6 +98,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 data class NavItem(val label: String, val icon: ImageVector)
 
@@ -348,7 +350,7 @@ fun BoxScope.PromptHost(spec: PromptSpec?, onDismiss: () -> Unit) {
                     ),
                 )
                 Row(Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    GlassButton("Cancelar", onDismiss, Modifier.weight(1f))
+                    GlassButton(str(R.string.cancel), onDismiss, Modifier.weight(1f))
                     GlassButton(
                         s.confirmLabel,
                         confirm,

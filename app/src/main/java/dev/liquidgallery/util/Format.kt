@@ -1,39 +1,53 @@
 package dev.liquidgallery.util
 
+import android.text.format.DateFormat
+import dev.liquidgallery.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private val es = Locale.forLanguageTag("es-ES")
-private val dayThisYear = DateTimeFormatter.ofPattern("EEE, d MMM", es)
-private val dayOtherYear = DateTimeFormatter.ofPattern("EEE, d MMM yyyy", es)
-private val monthFmt = DateTimeFormatter.ofPattern("LLLL 'de' yyyy", es)
-private val fullFmt = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", es)
-private val timeFmt = DateTimeFormatter.ofPattern("HH:mm", es)
-private val shortFmt = DateTimeFormatter.ofPattern("d MMM yyyy", es)
+/** Formatos de fecha del idioma del teléfono; se rehacen si cambia. */
+private class Formats(val locale: Locale) {
+    private fun best(skeleton: String) = DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
+
+    val dayThisYear = best("EEEdMMM")
+    val dayOtherYear = best("EEEdMMMyyyy")
+    val month = best("LLLLyyyy")
+    val full = best("EEEEdMMMMyyyy")
+    val time = best("Hm")
+    val short = best("dMMMyyyy")
+}
+
+private var formats = Formats(Locale.getDefault())
+
+private fun formats(): Formats {
+    val locale = Locale.getDefault()
+    if (formats.locale != locale) formats = Formats(locale)
+    return formats
+}
 
 fun localDate(ms: Long): LocalDate = Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()).toLocalDate()
 
-private fun String.capitalized() = replaceFirstChar { it.titlecase(es) }
+private fun String.capitalized() = replaceFirstChar { it.titlecase(Locale.getDefault()) }
 
 /** Cabecera de un día: "Hoy", "Ayer", "Lun, 13 oct" o "Lun, 13 oct 2024". */
 fun dayLabel(day: LocalDate, today: LocalDate = LocalDate.now()): String = when (day) {
-    today -> "Hoy"
-    today.minusDays(1) -> "Ayer"
-    else -> (if (day.year == today.year) dayThisYear else dayOtherYear).format(day).replace(".", "").capitalized()
+    today -> str(R.string.today)
+    today.minusDays(1) -> str(R.string.yesterday)
+    else -> formats().let { if (day.year == today.year) it.dayThisYear else it.dayOtherYear }.format(day).replace(".", "").capitalized()
 }
 
 /** Cabecera de un mes: "Octubre de 2026". */
-fun monthLabel(day: LocalDate): String = monthFmt.format(day).capitalized()
+fun monthLabel(day: LocalDate): String = formats().month.format(day).capitalized()
 
 /** "Miércoles, 15 de octubre de 2026". */
-fun fullDate(ms: Long): String = fullFmt.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault())).capitalized()
+fun fullDate(ms: Long): String = formats().full.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault())).capitalized()
 
-fun timeOf(ms: Long): String = timeFmt.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()))
+fun timeOf(ms: Long): String = formats().time.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()))
 
-fun shortDate(ms: Long): String = shortFmt.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault())).replace(".", "")
+fun shortDate(ms: Long): String = formats().short.format(Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault())).replace(".", "")
 
 /** "0:07", "12:34" o "1:02:03". */
 fun duration(ms: Long): String {
@@ -53,9 +67,9 @@ fun fileSize(bytes: Long): String {
         v /= 1024
         i++
     }
-    return if (i == 0) "$bytes B" else String.format(es, "%.1f %s", v, units[i])
+    return if (i == 0) "$bytes B" else String.format(Locale.getDefault(), "%.1f %s", v, units[i])
 }
 
 /** "1.234 elementos". */
-fun countLabel(n: Int, one: String = "elemento", many: String = "elementos"): String =
-    "${String.format(es, "%,d", n)} ${if (n == 1) one else many}"
+fun countLabel(n: Int, id: Int = R.plurals.items): String =
+    plural(id, n, String.format(Locale.getDefault(), "%,d", n))

@@ -105,6 +105,8 @@ import dev.liquidgallery.ui.glass.SheetSpec
 import dev.liquidgallery.util.countLabel
 import dev.liquidgallery.util.thumb
 import kotlin.math.roundToInt
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 private val ALBUM_COLUMNS = listOf(2, 3, 4)
 
@@ -143,15 +145,15 @@ fun AlbumsScreen(
         buildList {
             val (pinned, rest) = albums.partition { dev.liquidgallery.data.isPinnedAlbum(it.path) }
             pinned.forEach { add(Tile.AlbumTile(it)) }
-            add(Tile.Virtual(Source.Favorites, "Favoritos", favorites.firstOrNull(), favorites.size, Icons.Rounded.Favorite))
-            if (videos.isNotEmpty()) add(Tile.Virtual(Source.Videos, "Vídeos", videos.first(), videos.size, Icons.Rounded.PlayCircle))
+            add(Tile.Virtual(Source.Favorites, str(R.string.favorites), favorites.firstOrNull(), favorites.size, Icons.Rounded.Favorite))
+            if (videos.isNotEmpty()) add(Tile.Virtual(Source.Videos, str(R.string.videos), videos.first(), videos.size, Icons.Rounded.PlayCircle))
             prefs.groups.forEach { g -> add(Tile.GroupTile(g, albums.filter { it.path in g.albums })) }
             rest.filter { it.path !in grouped }.forEach { add(Tile.AlbumTile(it)) }
         }
     }
 
     fun newAlbum() = prompt(
-        PromptSpec("Nuevo álbum", "Crear", "Nombre del álbum", "Se crea en Imágenes/") { name ->
+        PromptSpec(str(R.string.new_album), str(R.string.create), str(R.string.album_name), str(R.string.new_album_hint)) { name ->
             if (name.isNotBlank()) {
                 val path = newAlbumPath(name)
                 Stores.albums.update { it.copy(empty = (it.empty + path).distinct()) }
@@ -161,7 +163,7 @@ fun AlbumsScreen(
     )
 
     fun newGroup() = prompt(
-        PromptSpec("Nuevo grupo", "Crear", "Nombre del grupo", "Mantén pulsado un álbum para añadirlo") { name ->
+        PromptSpec(str(R.string.new_group), str(R.string.create), str(R.string.group_name), str(R.string.new_group_hint)) { name ->
             if (name.isNotBlank()) {
                 Stores.albums.update { it.copy(groups = it.groups + AlbumGroup(System.currentTimeMillis(), name)) }
             }
@@ -174,28 +176,28 @@ fun AlbumsScreen(
         onColumns = { c -> Stores.settings.update { it.copy(albumColumns = c) } },
     ) {
         item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
-            ScreenTitle("Álbumes", Modifier.padding(horizontal = 6.dp), subtitle = countLabel(albums.size, "álbum", "álbumes")) {
-                GlassIconButton(Icons.Rounded.Add, "Crear", {
+            ScreenTitle(str(R.string.tab_albums), Modifier.padding(horizontal = 6.dp), subtitle = countLabel(albums.size, R.plurals.albums)) {
+                GlassIconButton(Icons.Rounded.Add, str(R.string.create), {
                     sheet(
                         SheetSpec(
-                            "Crear",
+                            str(R.string.create),
                             listOf(
-                                SheetAction("Álbum", Icons.Rounded.PhotoAlbum) { newAlbum() },
-                                SheetAction("Grupo de álbumes", Icons.Rounded.CreateNewFolder) { newGroup() },
+                                SheetAction(str(R.string.album), Icons.Rounded.PhotoAlbum) { newAlbum() },
+                                SheetAction(str(R.string.album_group), Icons.Rounded.CreateNewFolder) { newGroup() },
                             ),
                         ),
                     )
                 }, prominent = true)
-                GlassIconButton(Icons.Rounded.MoreVert, "Más", {
+                GlassIconButton(Icons.Rounded.MoreVert, str(R.string.more), {
                     sheet(
                         SheetSpec(
-                            "Álbumes",
+                            str(R.string.tab_albums),
                             listOf(
-                                SheetAction("Ordenar por…", Icons.AutoMirrored.Rounded.Sort) {
+                                SheetAction(str(R.string.sort_by_ellipsis), Icons.AutoMirrored.Rounded.Sort) {
                                     sheet(
                                         SheetSpec(
-                                            "Ordenar por",
-                                            listOf("Personalizado", "Nombre", "Número de elementos", "Más reciente").mapIndexed { i, label ->
+                                            str(R.string.sort_by),
+                                            listOf(R.string.sort_custom, R.string.sort_name, R.string.sort_count, R.string.sort_recent).map { str(it) }.mapIndexed { i, label ->
                                                 SheetAction(
                                                     if (settings.albumSort == i) "$label  ✓" else label,
                                                     Icons.AutoMirrored.Rounded.Sort,
@@ -204,8 +206,8 @@ fun AlbumsScreen(
                                         ),
                                     )
                                 },
-                                SheetAction("Cambiar el orden", Icons.Rounded.SwapVert, onClick = onReorder),
-                                SheetAction("Oculto", Icons.Rounded.Lock, onClick = onVault),
+                                SheetAction(str(R.string.reorder), Icons.Rounded.SwapVert, onClick = onReorder),
+                                SheetAction(str(R.string.hidden), Icons.Rounded.Lock, onClick = onVault),
                             ),
                         ),
                     )
@@ -295,7 +297,7 @@ private fun albumSheet(
         buildList {
             if (inGroup != null) {
                 add(
-                    SheetAction("Sacar del grupo", Icons.Rounded.FolderOff) {
+                    SheetAction(str(R.string.remove_from_group), Icons.Rounded.FolderOff) {
                         Stores.albums.update { p ->
                             p.copy(groups = p.groups.map { if (it.id == inGroup.id) it.copy(albums = it.albums - album.path) else it })
                         }
@@ -304,7 +306,7 @@ private fun albumSheet(
             }
             groups.filter { it.id != inGroup?.id }.forEach { g ->
                 add(
-                    SheetAction("Añadir a «${g.name}»", Icons.Rounded.Folder) {
+                    SheetAction(str(R.string.add_to_group, g.name), Icons.Rounded.Folder) {
                         Stores.albums.update { p ->
                             p.copy(
                                 groups = p.groups.map {
@@ -320,10 +322,10 @@ private fun albumSheet(
             }
             val items = media.filter { it.album == album.path }
             if (items.isNotEmpty()) {
-                add(SheetAction("Ocultar álbum", Icons.Rounded.VisibilityOff) { actions.hide(items) })
+                add(SheetAction(str(R.string.hide_album), Icons.Rounded.VisibilityOff) { actions.hide(items) })
             }
             add(
-                SheetAction("Eliminar álbum", Icons.Rounded.Delete, danger = true) {
+                SheetAction(str(R.string.delete_album), Icons.Rounded.Delete, danger = true) {
                     if (items.isEmpty()) {
                         Stores.albums.update { it.copy(empty = it.empty - album.path) }
                     } else {
@@ -338,20 +340,20 @@ private fun albumSheet(
 private fun groupSheet(group: AlbumGroup, prompt: (PromptSpec) -> Unit): SheetSpec = SheetSpec(
     group.name,
     listOf(
-        SheetAction("Cambiar el nombre", Icons.Rounded.Edit) {
+        SheetAction(str(R.string.rename), Icons.Rounded.Edit) {
             prompt(
-                PromptSpec("Cambiar el nombre", "Guardar", group.name) { name ->
+                PromptSpec(str(R.string.rename), str(R.string.save), group.name) { name ->
                     if (name.isNotBlank()) {
                         Stores.albums.update { p -> p.copy(groups = p.groups.map { if (it.id == group.id) it.copy(name = name) else it }) }
                     }
                 },
             )
         },
-        SheetAction("Desagrupar", Icons.Rounded.FolderOff, danger = true) {
+        SheetAction(str(R.string.ungroup), Icons.Rounded.FolderOff, danger = true) {
             Stores.albums.update { p -> p.copy(groups = p.groups.filter { it.id != group.id }) }
         },
     ),
-    subtitle = "Desagrupar no borra los álbumes",
+    subtitle = str(R.string.ungroup_hint),
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -445,7 +447,7 @@ private fun GroupCard(name: String, albums: List<Album>, onClick: () -> Unit, on
             Spacer(Modifier.width(4.dp))
             Text(name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        Text(countLabel(albums.size, "álbum", "álbumes"), Modifier.padding(start = 4.dp), fontSize = 13.sp, color = p.contentSecondary)
+        Text(countLabel(albums.size, R.plurals.albums), Modifier.padding(start = 4.dp), fontSize = 13.sp, color = p.contentSecondary)
     }
 }
 
@@ -464,11 +466,11 @@ fun GroupScreen(groupId: Long, padding: PaddingValues, onBack: () -> Unit, onOpe
     }
     AlbumGrid(padding, settings.albumColumns, null) {
         item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
-            BackTitle(group?.name ?: "Grupo", onBack, subtitle = countLabel(albums.size, "álbum", "álbumes"))
+            BackTitle(group?.name ?: str(R.string.group), onBack, subtitle = countLabel(albums.size, R.plurals.albums))
         }
         if (albums.isEmpty()) {
             item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
-                EmptyState("Grupo vacío", "Mantén pulsado un álbum y elige «Añadir a…».")
+                EmptyState(str(R.string.group_empty_title), str(R.string.group_empty_subtitle))
             }
         }
         items(albums.size, key = { albums[it].path }) { i ->
@@ -493,12 +495,12 @@ fun AlbumPickerScreen(items: List<Media>, copy: Boolean, padding: PaddingValues,
     val from = items.map { it.album }.distinct().singleOrNull()
     AlbumGrid(padding, 3, null) {
         item(key = "title", span = { GridItemSpan(maxLineSpan) }) {
-            BackTitle(if (copy) "Copiar a" else "Mover a", onDone, subtitle = countLabel(items.size))
+            BackTitle(str(if (copy) R.string.copy_to else R.string.move_to), onDone, subtitle = countLabel(items.size))
         }
         item(key = "new") {
-            AlbumCard("Nuevo álbum", null, 0, icon = Icons.Rounded.Add, onClick = {
+            AlbumCard(str(R.string.new_album), null, 0, icon = Icons.Rounded.Add, onClick = {
                 prompt(
-                    PromptSpec("Nuevo álbum", if (copy) "Copiar" else "Mover", "Nombre del álbum") { name ->
+                    PromptSpec(str(R.string.new_album), str(if (copy) R.string.copy else R.string.move), str(R.string.album_name)) { name ->
                         if (name.isNotBlank()) {
                             actions.moveTo(items, newAlbumPath(name), copy)
                             onDone()
@@ -553,8 +555,8 @@ fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
         userScrollEnabled = dragging < 0,
     ) {
         item {
-            BackTitle("Cambiar el orden", { save(); onBack() }, subtitle = "Arrastra desde el asa")
-            SectionLabel("Cámara siempre va primero")
+            BackTitle(str(R.string.reorder), { save(); onBack() }, subtitle = str(R.string.drag_handle_hint))
+            SectionLabel(str(R.string.camera_first))
         }
         itemsIndexed(list, key = { _, a -> a.path }) { i, a ->
             val lifted by animateFloatAsState(if (dragging == i) 1f else 0f, label = "lift")
@@ -582,7 +584,7 @@ fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
                     Text(countLabel(a.count), fontSize = 13.sp, color = p.contentSecondary)
                 }
                 Icon(
-                    Icons.Rounded.DragHandle, "Arrastrar",
+                    Icons.Rounded.DragHandle, str(R.string.drag),
                     Modifier
                         .size(44.dp)
                         .padding(10.dp)
@@ -620,10 +622,10 @@ fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
         item {
             Spacer(Modifier.height(16.dp))
             GlassCard {
-                Text("El orden se guarda al volver.", fontSize = 14.sp, color = p.contentSecondary)
+                Text(str(R.string.order_saved_on_back), fontSize = 14.sp, color = p.contentSecondary)
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    GlassChip("Por nombre", false, { list = list.sortedBy { it.name.lowercase() } })
-                    GlassChip("Por cantidad", false, { list = list.sortedByDescending { it.count } })
+                    GlassChip(str(R.string.by_name), false, { list = list.sortedBy { it.name.lowercase() } })
+                    GlassChip(str(R.string.by_count), false, { list = list.sortedByDescending { it.count } })
                 }
             }
         }

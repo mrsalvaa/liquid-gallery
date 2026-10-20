@@ -98,6 +98,7 @@ import dev.liquidgallery.util.preferHighestRefreshRate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import dev.liquidgallery.util.str
 
 /** Pantallas que se abren encima de las pestañas, apiladas. */
 sealed interface Overlay {
@@ -194,9 +195,9 @@ private fun App(consent: ConsentRunner, animated: Boolean) {
             ) {
                 GlassNavBar(
                     items = listOf(
-                        NavItem("Imágenes", Icons.Rounded.Photo),
-                        NavItem("Álbumes", Icons.Rounded.PhotoAlbum),
-                        NavItem("Más", Icons.Rounded.Menu),
+                        NavItem(str(R.string.tab_photos), Icons.Rounded.Photo),
+                        NavItem(str(R.string.tab_albums), Icons.Rounded.PhotoAlbum),
+                        NavItem(str(R.string.more), Icons.Rounded.Menu),
                     ),
                     selected = tab,
                     dragPosition = { tabDrag },

@@ -14,6 +14,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 /**
  * Lanza las confirmaciones de Android (borrar, mover, favoritos...) y espera la respuesta.
@@ -123,7 +125,7 @@ class MediaOps(private val context: Context, private val consent: ConsentRunner)
         withContext(Dispatchers.IO) {
             val format = formatFor(original.mime)
             val base = original.name.substringBeforeLast('.')
-            val name = "${base}_editada.${format.second}"
+            val name = "$base${str(R.string.edited_suffix)}.${format.second}"
             val target = insert(name, format.third, false, original.album, System.currentTimeMillis())
                 ?: return@withContext null
             try {

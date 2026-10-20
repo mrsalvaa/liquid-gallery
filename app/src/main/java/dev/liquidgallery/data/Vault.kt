@@ -23,6 +23,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import java.io.File
 import java.util.UUID
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 /**
  * Bóveda privada: lo oculto se mueve a archivos internos de la app, donde ninguna otra app ni
@@ -107,7 +109,7 @@ object Vault {
                     },
                 )
             }.getOrNull()
-            val target = insert(v.album.ifEmpty { "Pictures/Restaurados/" }) ?: insert("Pictures/Restaurados/") ?: return@filter false
+            val target = insert(v.album.ifEmpty { "Pictures/${str(R.string.restored_folder)}/" }) ?: insert("Pictures/${str(R.string.restored_folder)}/") ?: return@filter false
             try {
                 source.inputStream().use { input -> resolver.openOutputStream(target)!!.use { input.copyTo(it) } }
                 resolver.update(target, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
@@ -148,8 +150,8 @@ object VaultLock {
         when (BiometricManager.from(context).canAuthenticate(AUTHENTICATORS)) {
             BiometricManager.BIOMETRIC_SUCCESS -> null
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
-                "Configura un bloqueo de pantalla (PIN, patrón o huella) en los ajustes de Android para usar Oculto."
-            else -> "Este móvil no permite desbloquear con huella ni PIN."
+                str(R.string.vault_no_lock)
+            else -> str(R.string.vault_unsupported)
         }
 
     fun unlock(activity: FragmentActivity, onResult: (Boolean, String?) -> Unit) {
@@ -171,8 +173,8 @@ object VaultLock {
         )
         prompt.authenticate(
             BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Oculto")
-                .setSubtitle("Desbloquea para ver lo oculto")
+                .setTitle(str(R.string.hidden))
+                .setSubtitle(str(R.string.vault_prompt_subtitle))
                 .setAllowedAuthenticators(AUTHENTICATORS)
                 .build(),
         )

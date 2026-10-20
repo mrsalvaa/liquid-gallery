@@ -34,6 +34,7 @@ import dev.liquidgallery.ui.screens.mediaAccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import dev.liquidgallery.util.str
 
 /**
  * Abre una foto o un vídeo que manda otra app. Si está en la galería se puede deslizar por su
@@ -96,7 +97,7 @@ class ViewerActivity : FragmentActivity() {
                 MediaRepo.media.value.firstOrNull { it.id == id }?.let { return@withContext Target.InGallery(it) }
             }
         }
-        var name = uri.lastPathSegment ?: "Archivo"
+        var name = uri.lastPathSegment ?: str(R.string.file)
         var size = 0L
         if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
             runCatching {

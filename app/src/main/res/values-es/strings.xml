@@ -1,4 +1,315 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Galería</string>
+
+    <!-- Pestañas y secciones -->
+    <string name="tab_photos">Imágenes</string>
+    <string name="tab_albums">Álbumes</string>
+    <string name="more">Más</string>
+    <string name="favorites">Favoritos</string>
+    <string name="videos">Vídeos</string>
+    <string name="trash">Papelera</string>
+    <string name="archive">Archivo</string>
+    <string name="hidden">Oculto</string>
+    <string name="settings">Ajustes</string>
+    <string name="search">Buscar</string>
+
+    <!-- Comunes -->
+    <string name="back">Atrás</string>
+    <string name="close">Cerrar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="create">Crear</string>
+    <string name="save">Guardar</string>
+    <string name="share">Compartir</string>
+    <string name="favorite">Favorito</string>
+    <string name="delete">Eliminar</string>
+    <string name="restore">Restaurar</string>
+    <string name="unhide">Mostrar</string>
+    <string name="edit">Editar</string>
+    <string name="select">Seleccionar</string>
+    <string name="all">Todo</string>
+    <string name="loading">Cargando…</string>
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+    <string name="days_short">%d d</string>
+    <string name="rename">Cambiar el nombre</string>
+    <string name="file">Archivo</string>
+
+    <!-- Cantidades -->
+    <plurals name="items">
+        <item quantity="one">%s elemento</item>
+        <item quantity="many">%s elementos</item>
+        <item quantity="other">%s elementos</item>
+    </plurals>
+    <plurals name="albums">
+        <item quantity="one">%s álbum</item>
+        <item quantity="many">%s álbumes</item>
+        <item quantity="other">%s álbumes</item>
+    </plurals>
+    <plurals name="results">
+        <item quantity="one">%s resultado</item>
+        <item quantity="many">%s resultados</item>
+        <item quantity="other">%s resultados</item>
+    </plurals>
+    <plurals name="selected">
+        <item quantity="one">%d seleccionado</item>
+        <item quantity="many">%d seleccionados</item>
+        <item quantity="other">%d seleccionados</item>
+    </plurals>
+    <string name="select_items">Selecciona elementos</string>
+
+    <!-- Avisos -->
+    <plurals name="toast_trashed">
+        <item quantity="one">Movido a la papelera</item>
+        <item quantity="many">%d elementos movidos a la papelera</item>
+        <item quantity="other">%d elementos movidos a la papelera</item>
+    </plurals>
+    <plurals name="toast_restored">
+        <item quantity="one">Restaurado</item>
+        <item quantity="many">%d elementos restaurados</item>
+        <item quantity="other">%d elementos restaurados</item>
+    </plurals>
+    <plurals name="toast_deleted">
+        <item quantity="one">Eliminado</item>
+        <item quantity="many">%d elementos eliminados</item>
+        <item quantity="other">%d elementos eliminados</item>
+    </plurals>
+    <string name="toast_copy_failed">No se pudo copiar</string>
+    <string name="toast_move_failed">No se pudo mover</string>
+    <string name="toast_copied">Copiados %d</string>
+    <string name="toast_moved">Movidos %d</string>
+    <plurals name="toast_archived">
+        <item quantity="one">Archivado</item>
+        <item quantity="many">%d elementos archivados</item>
+        <item quantity="other">%d elementos archivados</item>
+    </plurals>
+    <plurals name="toast_unarchived">
+        <item quantity="one">Ya no está archivado</item>
+        <item quantity="many">%d elementos desarchivados</item>
+        <item quantity="other">%d elementos desarchivados</item>
+    </plurals>
+    <string name="toast_hiding">Ocultando…</string>
+    <plurals name="toast_hidden">
+        <item quantity="one">Movido a Oculto</item>
+        <item quantity="many">%d elementos movidos a Oculto</item>
+        <item quantity="other">%d elementos movidos a Oculto</item>
+    </plurals>
+    <string name="toast_nothing_hidden">No se ocultó nada</string>
+    <plurals name="toast_unhidden">
+        <item quantity="one">Restaurado a su álbum</item>
+        <item quantity="many">%d elementos restaurados</item>
+        <item quantity="other">%d elementos restaurados</item>
+    </plurals>
+    <string name="toast_rename_failed">No se pudo cambiar el nombre</string>
+    <string name="toast_saved">Guardado</string>
+    <string name="toast_saved_copy">Guardado como copia</string>
+    <string name="toast_save_failed">No se pudo guardar</string>
+
+    <!-- Selección y hojas -->
+    <string name="move_to_album">Mover a un álbum</string>
+    <string name="copy_to_album">Copiar a un álbum</string>
+    <string name="do_archive">Archivar</string>
+    <string name="unarchive">Desarchivar</string>
+    <string name="hide">Ocultar</string>
+    <string name="hide_subtitle">Ocultar lo mueve a la bóveda privada, protegida con tu huella o PIN</string>
+    <string name="delete_named">¿Eliminar «%s»?</string>
+    <string name="move_n_to_trash">Mover %s a la papelera</string>
+    <string name="trash_recover_hint">Podrás recuperarlos desde la papelera durante 30 días.</string>
+    <string name="delete_forever_q">¿Eliminar para siempre?</string>
+    <string name="delete_n">Eliminar %s</string>
+    <string name="hidden_no_trash">Lo oculto no pasa por la papelera: no se puede deshacer.</string>
+
+    <!-- Imágenes -->
+    <string name="no_media_title">No hay fotos ni vídeos</string>
+    <string name="no_media_subtitle">Las fotos que hagas o descargues aparecerán aquí.</string>
+
+    <!-- Colecciones -->
+    <string name="trash_subtitle">Se eliminan para siempre a los 30 días</string>
+    <string name="vault_subtitle">Solo tú puedes verlo · %s</string>
+    <string name="archive_subtitle">No salen en Imágenes · %s</string>
+    <string name="empty_trash">Vaciar papelera</string>
+    <string name="empty_trash_q">¿Vaciar la papelera?</string>
+    <string name="delete_n_forever">Eliminar %s para siempre</string>
+    <string name="restore_all">Restaurar todo</string>
+    <string name="cant_undo">No se puede deshacer.</string>
+    <string name="hide_album">Ocultar álbum</string>
+    <string name="delete_album">Eliminar álbum</string>
+    <string name="unfavorite_all">Quitar todos de favoritos</string>
+    <string name="unhide_all">Mostrar todo</string>
+    <string name="lock_now">Bloquear ahora</string>
+    <string name="vault_warning">Lo oculto se guarda dentro de la app. Si la desinstalas sin mostrarlo antes, se pierde.</string>
+    <string name="trash_empty_title">La papelera está vacía</string>
+    <string name="trash_empty_subtitle">Lo que elimines se queda aquí 30 días.</string>
+    <string name="favorites_empty_title">Sin favoritos</string>
+    <string name="favorites_empty_subtitle">Toca el corazón al ver una foto.</string>
+    <string name="archive_empty_title">Nada archivado</string>
+    <string name="archive_empty_subtitle">Archiva capturas o memes para quitarlos de Imágenes.</string>
+    <string name="vault_empty_title">Nada oculto</string>
+    <string name="vault_empty_subtitle">Selecciona fotos y elige Más → Ocultar.</string>
+    <string name="album_empty_title">Álbum vacío</string>
+    <string name="album_empty_subtitle">Mueve o copia fotos a este álbum.</string>
+
+    <!-- Oculto -->
+    <string name="vault_locked">Oculto está bloqueado</string>
+    <string name="vault_unlock_hint">Usa tu huella, cara o el PIN del móvil.</string>
+    <string name="unlock">Desbloquear</string>
+    <string name="vault_prompt_subtitle">Desbloquea para ver lo oculto</string>
+    <string name="vault_no_lock">Configura un bloqueo de pantalla (PIN, patrón o huella) en los ajustes de Android para usar Oculto.</string>
+    <string name="vault_unsupported">Este móvil no permite desbloquear con huella ni PIN.</string>
+    <string name="restored_folder">Restaurados</string>
+
+    <!-- Álbumes -->
+    <string name="new_album">Nuevo álbum</string>
+    <string name="album_name">Nombre del álbum</string>
+    <string name="new_album_hint">Se crea en Imágenes/</string>
+    <string name="new_group">Nuevo grupo</string>
+    <string name="group_name">Nombre del grupo</string>
+    <string name="new_group_hint">Mantén pulsado un álbum para añadirlo</string>
+    <string name="album">Álbum</string>
+    <string name="album_group">Grupo de álbumes</string>
+    <string name="sort_by_ellipsis">Ordenar por…</string>
+    <string name="sort_by">Ordenar por</string>
+    <string name="sort_custom">Personalizado</string>
+    <string name="sort_name">Nombre</string>
+    <string name="sort_count">Número de elementos</string>
+    <string name="sort_recent">Más reciente</string>
+    <string name="reorder">Cambiar el orden</string>
+    <string name="remove_from_group">Sacar del grupo</string>
+    <string name="add_to_group">Añadir a «%s»</string>
+    <string name="ungroup">Desagrupar</string>
+    <string name="ungroup_hint">Desagrupar no borra los álbumes</string>
+    <string name="group">Grupo</string>
+    <string name="group_empty_title">Grupo vacío</string>
+    <string name="group_empty_subtitle">Mantén pulsado un álbum y elige «Añadir a…».</string>
+    <string name="copy_to">Copiar a</string>
+    <string name="move_to">Mover a</string>
+    <string name="copy">Copiar</string>
+    <string name="move">Mover</string>
+    <string name="drag_handle_hint">Arrastra desde el asa</string>
+    <string name="camera_first">Cámara siempre va primero</string>
+    <string name="drag">Arrastrar</string>
+    <string name="order_saved_on_back">El orden se guarda al volver.</string>
+    <string name="by_name">Por nombre</string>
+    <string name="by_count">Por cantidad</string>
+    <string name="album_camera">Cámara</string>
+    <string name="album_screenshots">Capturas de pantalla</string>
+    <string name="album_screen_recordings">Grabaciones de pantalla</string>
+    <string name="album_downloads">Descargas</string>
+    <string name="album_whatsapp_video">WhatsApp Vídeo</string>
+
+    <!-- Visor -->
+    <plurals name="deleted_in_days">
+        <item quantity="one">Se eliminará en %d día</item>
+        <item quantity="many">Se eliminará en %d días</item>
+        <item quantity="other">Se eliminará en %d días</item>
+    </plurals>
+    <string name="play">Reproducir</string>
+    <string name="sound">Sonido</string>
+    <string name="details">Detalles</string>
+    <string name="use_as">Usar como…</string>
+    <string name="open_with">Abrir con…</string>
+    <string name="detail_name">Nombre</string>
+    <string name="detail_location">Ubicación</string>
+    <string name="detail_video">Vídeo</string>
+    <string name="detail_image">Imagen</string>
+    <string name="detail_camera">Cámara</string>
+    <string name="detail_shot">Disparo</string>
+    <string name="detail_lens">Objetivo</string>
+
+    <!-- Editor -->
+    <string name="filter_original">Original</string>
+    <string name="filter_vivid">Vivo</string>
+    <string name="filter_warm">Cálido</string>
+    <string name="filter_cool">Frío</string>
+    <string name="filter_bw">B/N</string>
+    <string name="filter_noir">Noir</string>
+    <string name="filter_sepia">Sepia</string>
+    <string name="filter_faded">Desvaído</string>
+    <string name="filter_dramatic">Dramático</string>
+    <string name="ratio_free">Libre</string>
+    <string name="discard_changes_q">¿Descartar los cambios?</string>
+    <string name="discard">Descartar</string>
+    <string name="reset">Restablecer</string>
+    <string name="save_copy">Guardar como copia</string>
+    <string name="overwrite_original">Sobrescribir la original</string>
+    <string name="rotate">Girar</string>
+    <string name="flip">Voltear</string>
+    <string name="brightness">Brillo</string>
+    <string name="contrast">Contraste</string>
+    <string name="saturation">Saturación</string>
+    <string name="warmth">Calidez</string>
+    <string name="crop">Recortar</string>
+    <string name="adjust">Ajustes</string>
+    <string name="filters">Filtros</string>
+    <string name="edited_suffix">_editada</string>
+
+    <!-- Más -->
+    <string name="permission_title">Tus fotos y vídeos</string>
+    <string name="permission_text">%s necesita permiso para mostrarlos. No tiene acceso a internet: nada sale de tu móvil.</string>
+    <string name="open_settings">Abrir ajustes</string>
+    <string name="allow_access">Permitir acceso</string>
+    <string name="limited_access">Acceso limitado</string>
+    <string name="limited_access_text">Solo ves las fotos que elegiste. Permite el acceso a todas para usar la galería completa.</string>
+    <string name="allow_all">Permitir todo</string>
+    <string name="fewer_prompts">Menos confirmaciones</string>
+    <string name="fewer_prompts_text">Android pide confirmar cada vez que borras, mueves o marcas favoritos. Con el permiso «Gestionar contenido multimedia» se hace al momento.</string>
+    <string name="allow">Permitir</string>
+    <string name="about_short">Software libre (GPL-3.0). Sin internet, sin anuncios y sin rastreo: tus fotos no salen del móvil.</string>
+
+    <!-- Ajustes -->
+    <string name="appearance">Apariencia</string>
+    <string name="grid">Cuadrícula</string>
+    <string name="grid_columns">Columnas en Imágenes</string>
+    <string name="grid_columns_hint">También puedes pellizcar la cuadrícula. Con 6 u 8 columnas se agrupa por meses.</string>
+    <string name="start_muted">Empezar sin sonido</string>
+    <string name="loop_videos">Repetir al terminar</string>
+    <string name="permissions">Permisos</string>
+    <string name="manage_media">Gestionar contenido multimedia</string>
+    <string name="manage_media_on">Permitido: sin confirmaciones al borrar o mover</string>
+    <string name="manage_media_off">Sin permitir: Android pedirá confirmación</string>
+    <string name="about">Acerca de</string>
+    <string name="version">Versión %s</string>
+    <string name="about_text">Software libre bajo la licencia GPL-3.0. No pide permiso de internet, no tiene anuncios ni rastreo. La papelera y los favoritos son los de Android, así que se comparten con otras galerías.</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="background">Fondo</string>
+    <string name="background_moving">En movimiento</string>
+    <string name="background_accent">Color de énfasis</string>
+    <string name="animated_background">Fondo animado</string>
+    <string name="animated_background_hint">Desactívalo para ahorrar batería</string>
+    <string name="tone">Tono</string>
+    <string name="tone_light">Claro</string>
+    <string name="tone_medium">Medio</string>
+    <string name="tone_dark">Oscuro</string>
+    <string name="app_icon">Icono de la app</string>
+    <string name="app_icon_hint">El launcher puede tardar unos segundos en mostrar el icono nuevo, y quizá tengas que volver a ponerlo en la pantalla de inicio.</string>
+    <string name="colors_sky_pink">Celeste y rosa</string>
+    <string name="colors_aurora">Aurora</string>
+    <string name="colors_sunset">Atardecer</string>
+    <string name="colors_ocean">Océano</string>
+    <string name="hue_red">Rojo</string>
+    <string name="hue_orange">Naranja</string>
+    <string name="hue_yellow">Amarillo</string>
+    <string name="hue_green">Verde</string>
+    <string name="hue_mint">Menta</string>
+    <string name="hue_sky">Celeste</string>
+    <string name="hue_blue">Azul</string>
+    <string name="hue_violet">Violeta</string>
+    <string name="hue_pink">Rosa</string>
+    <string name="hue_gray">Gris</string>
+
+    <!-- Búsqueda -->
+    <string name="search_hint">Nombre, álbum, fecha, «vídeo»…</string>
+    <string name="search_suggest_screenshots">Capturas</string>
+    <string name="no_results">Sin resultados</string>
+    <string name="no_results_hint">Prueba con otra palabra.</string>
+    <string name="search_offline">La búsqueda se hace en el móvil, sin conexión.</string>
+    <!-- Palabras que encuentran cada tipo al buscar -->
+    <string name="kw_video">video videos</string>
+    <string name="kw_photo">foto fotos imagen imagenes</string>
+    <string name="kw_gif">gif animado</string>
+    <string name="kw_screenshot">captura capturas pantalla</string>
+    <string name="kw_favorite">favorito favoritos</string>
 </resources>

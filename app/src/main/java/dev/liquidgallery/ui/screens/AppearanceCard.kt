@@ -43,6 +43,8 @@ import dev.liquidgallery.ui.glass.LocalGlass
 import dev.liquidgallery.ui.glass.muted
 import dev.liquidgallery.ui.glass.SettingRow
 import dev.liquidgallery.util.AppIcons
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 private fun Color.argb(): Long = toArgb().toLong() and 0xFFFFFFFFL
 
@@ -51,13 +53,13 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
     val context = LocalContext.current
     val p = LocalGlass.current
     GlassCard {
-        Label("Tema")
-        ChipRow(listOf(0, 1, 2), s.themeMode, { listOf("Sistema", "Claro", "Oscuro")[it] }) { v ->
+        Label(str(R.string.theme))
+        ChipRow(listOf(0, 1, 2), s.themeMode, { str(listOf(R.string.theme_system, R.string.theme_light, R.string.theme_dark)[it]) }) { v ->
             edit { it.copy(themeMode = v) }
         }
 
-        Label("Fondo")
-        ChipRow(listOf(0, 1), s.backgroundMode, { listOf("En movimiento", "Color de énfasis")[it] }) { v ->
+        Label(str(R.string.background))
+        ChipRow(listOf(0, 1), s.backgroundMode, { str(listOf(R.string.background_moving, R.string.background_accent)[it]) }) { v ->
             edit { it.copy(backgroundMode = v) }
         }
 
@@ -71,12 +73,12 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
                     Swatch(
                         brush = Brush.linearGradient(listOf(blobs[0], blobs[1])),
                         selected = s.colorSet == i,
-                        label = set.name,
+                        label = str(set.name),
                         modifier = Modifier.weight(1f),
                     ) { edit { it.copy(colorSet = i) } }
                 }
             }
-            SettingRow("Fondo animado", subtitle = "Desactívalo para ahorrar batería") {
+            SettingRow(str(R.string.animated_background), subtitle = str(R.string.animated_background_hint)) {
                 GlassSwitch(s.animatedBackground, { v -> edit { it.copy(animatedBackground = v) } })
             }
         } else {
@@ -89,7 +91,7 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
                         Swatch(
                             brush = Brush.linearGradient(listOf(muted(hue.tones[0]), muted(hue.tones[2]))),
                             selected = i == hueIndex,
-                            label = hue.name,
+                            label = str(hue.name),
                             modifier = Modifier.weight(1f),
                         ) {
                             // Al cambiar de color se queda con el mismo tono (claro, medio u oscuro).
@@ -99,7 +101,7 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
                     }
                 }
             }
-            Label("Tono")
+            Label(str(R.string.tone))
             Row(
                 Modifier.fillMaxWidth().padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -108,14 +110,14 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
                     Swatch(
                         brush = Brush.linearGradient(listOf(muted(tone), muted(tone))),
                         selected = tone.argb() == s.accentColor,
-                        label = listOf("Claro", "Medio", "Oscuro")[t],
+                        label = str(listOf(R.string.tone_light, R.string.tone_medium, R.string.tone_dark)[t]),
                         modifier = Modifier.width(62.dp),
                     ) { edit { it.copy(accentColor = tone.argb()) } }
                 }
             }
         }
 
-        Label("Icono de la app")
+        Label(str(R.string.app_icon))
         Row(
             Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -130,8 +132,7 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
             }
         }
         Text(
-            "El launcher puede tardar unos segundos en mostrar el icono nuevo, y quizá tengas que " +
-                "volver a ponerlo en la pantalla de inicio.",
+            str(R.string.app_icon_hint),
             fontSize = 12.sp,
             color = p.contentSecondary,
         )

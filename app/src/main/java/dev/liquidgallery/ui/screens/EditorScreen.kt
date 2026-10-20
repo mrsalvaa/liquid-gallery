@@ -101,20 +101,22 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
 
 /** Filtros: nombre y matriz de color 4x5 (como android.graphics.ColorMatrix). */
-private data class Filter(val name: String, val matrix: FloatArray?)
+private data class Filter(val name: Int, val matrix: FloatArray?)
 
 private val FILTERS = listOf(
-    Filter("Original", null),
-    Filter("Vivo", saturationMatrix(1.35f).also { scaleRgb(it, 1.04f, 1.04f, 1.04f) }),
-    Filter("Cálido", floatArrayOf(1.08f, 0f, 0f, 0f, 8f, 0f, 1.02f, 0f, 0f, 2f, 0f, 0f, 0.88f, 0f, -6f, 0f, 0f, 0f, 1f, 0f)),
-    Filter("Frío", floatArrayOf(0.9f, 0f, 0f, 0f, -4f, 0f, 1.0f, 0f, 0f, 2f, 0f, 0f, 1.1f, 0f, 10f, 0f, 0f, 0f, 1f, 0f)),
-    Filter("B/N", saturationMatrix(0f)),
-    Filter("Noir", saturationMatrix(0f).also { contrast(it, 1.35f) }),
-    Filter("Sepia", floatArrayOf(0.393f, 0.769f, 0.189f, 0f, 0f, 0.349f, 0.686f, 0.168f, 0f, 0f, 0.272f, 0.534f, 0.131f, 0f, 0f, 0f, 0f, 0f, 1f, 0f)),
-    Filter("Desvaído", saturationMatrix(0.7f).also { contrast(it, 0.8f); offset(it, 18f) }),
-    Filter("Dramático", saturationMatrix(1.15f).also { contrast(it, 1.3f); offset(it, -10f) }),
+    Filter(R.string.filter_original, null),
+    Filter(R.string.filter_vivid, saturationMatrix(1.35f).also { scaleRgb(it, 1.04f, 1.04f, 1.04f) }),
+    Filter(R.string.filter_warm, floatArrayOf(1.08f, 0f, 0f, 0f, 8f, 0f, 1.02f, 0f, 0f, 2f, 0f, 0f, 0.88f, 0f, -6f, 0f, 0f, 0f, 1f, 0f)),
+    Filter(R.string.filter_cool, floatArrayOf(0.9f, 0f, 0f, 0f, -4f, 0f, 1.0f, 0f, 0f, 2f, 0f, 0f, 1.1f, 0f, 10f, 0f, 0f, 0f, 1f, 0f)),
+    Filter(R.string.filter_bw, saturationMatrix(0f)),
+    Filter(R.string.filter_noir, saturationMatrix(0f).also { contrast(it, 1.35f) }),
+    Filter(R.string.filter_sepia, floatArrayOf(0.393f, 0.769f, 0.189f, 0f, 0f, 0.349f, 0.686f, 0.168f, 0f, 0f, 0.272f, 0.534f, 0.131f, 0f, 0f, 0f, 0f, 0f, 1f, 0f)),
+    Filter(R.string.filter_faded, saturationMatrix(0.7f).also { contrast(it, 0.8f); offset(it, 18f) }),
+    Filter(R.string.filter_dramatic, saturationMatrix(1.15f).also { contrast(it, 1.3f); offset(it, -10f) }),
 )
 
 private fun saturationMatrix(s: Float) = android.graphics.ColorMatrix().apply { setSaturation(s) }.array.copyOf()
@@ -160,7 +162,7 @@ private fun colorMatrix(filter: Int, a: Adjust): android.graphics.ColorMatrix? {
 }
 
 /** Proporciones de recorte; 0 = libre, -1 = la de la foto. */
-private val RATIOS = listOf("Libre" to 0f, "Original" to -1f, "1:1" to 1f, "4:3" to 4f / 3, "3:4" to 3f / 4, "16:9" to 16f / 9, "9:16" to 9f / 16)
+private val RATIOS get() = listOf(str(R.string.ratio_free) to 0f, str(R.string.filter_original) to -1f, "1:1" to 1f, "4:3" to 4f / 3, "3:4" to 3f / 4, "16:9" to 16f / 9, "9:16" to 9f / 16)
 
 /** Gira y voltea un bitmap (rotación en múltiplos de 90, en sentido antihorario). */
 private fun orient(src: Bitmap, rotation: Int, flip: Boolean): Bitmap {
@@ -227,7 +229,7 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
     }
     fun leave() {
         if (!changed) onClose() else sheet(
-            SheetSpec("¿Descartar los cambios?", listOf(SheetAction("Descartar", Icons.Rounded.Close, danger = true, onClick = onClose))),
+            SheetSpec(str(R.string.discard_changes_q), listOf(SheetAction(str(R.string.discard), Icons.Rounded.Close, danger = true, onClick = onClose))),
         )
     }
     BackHandler(enabled = !saving) { leave() }
@@ -272,10 +274,10 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
             }
             saving = false
             if (ok) {
-                actions.toast(if (overwrite) "Guardado" else "Guardado como copia")
+                actions.toast(str(if (overwrite) R.string.toast_saved else R.string.toast_saved_copy))
                 onSaved()
             } else {
-                actions.toast("No se pudo guardar")
+                actions.toast(str(R.string.toast_save_failed))
             }
         }
     }
@@ -291,19 +293,19 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
                 Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                GlassIconButton(Icons.Rounded.Close, "Cancelar", { leave() })
-                Text("Editar", Modifier.weight(1f).padding(horizontal = 14.dp), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                if (changed) GlassIconButton(Icons.Rounded.Restore, "Restablecer", { reset() })
+                GlassIconButton(Icons.Rounded.Close, str(R.string.cancel), { leave() })
+                Text(str(R.string.edit), Modifier.weight(1f).padding(horizontal = 14.dp), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                if (changed) GlassIconButton(Icons.Rounded.Restore, str(R.string.reset), { reset() })
                 Spacer(Modifier.width(10.dp))
                 GlassButton(
-                    "Guardar",
+                    str(R.string.save),
                     {
                         sheet(
                             SheetSpec(
-                                "Guardar",
+                                str(R.string.save),
                                 listOf(
-                                    SheetAction("Guardar como copia", Icons.Rounded.SaveAs) { save(false) },
-                                    SheetAction("Sobrescribir la original", Icons.Rounded.Save) { save(true) },
+                                    SheetAction(str(R.string.save_copy), Icons.Rounded.SaveAs) { save(false) },
+                                    SheetAction(str(R.string.overwrite_original), Icons.Rounded.Save) { save(true) },
                                 ),
                             ),
                         )
@@ -350,12 +352,12 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
                 when (tab) {
                     0 -> {
                         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            GlassIconButton(Icons.Rounded.RotateLeft, "Girar", {
+                            GlassIconButton(Icons.Rounded.RotateLeft, str(R.string.rotate), {
                                 rotation = (rotation + 90) % 360
                                 crop = Rect(0f, 0f, 1f, 1f)
                                 if (ratio != 0f) ratio = 0f
                             }, size = 40.dp)
-                            GlassIconButton(Icons.Rounded.Flip, "Voltear", {
+                            GlassIconButton(Icons.Rounded.Flip, str(R.string.flip), {
                                 flip = !flip
                                 crop = Rect(1f - crop.right, crop.top, 1f - crop.left, crop.bottom)
                             }, size = 40.dp)
@@ -363,7 +365,7 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
                         }
                     }
                     1 -> {
-                        val labels = listOf("Brillo", "Contraste", "Saturación", "Calidez")
+                        val labels = listOf(R.string.brightness, R.string.contrast, R.string.saturation, R.string.warmth).map { str(it) }
                         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             labels.forEachIndexed { i, l -> GlassChip(l, adjustKind == i, { adjustKind = i }) }
                         }
@@ -402,9 +404,9 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
 
             GlassNavBar(
                 items = listOf(
-                    NavItem("Recortar", Icons.Rounded.Crop),
-                    NavItem("Ajustes", Icons.Rounded.Tune),
-                    NavItem("Filtros", Icons.Rounded.AutoAwesome),
+                    NavItem(str(R.string.crop), Icons.Rounded.Crop),
+                    NavItem(str(R.string.adjust), Icons.Rounded.Tune),
+                    NavItem(str(R.string.filters), Icons.Rounded.AutoAwesome),
                 ),
                 selected = tab,
                 onSelect = { tab = it },
@@ -444,14 +446,14 @@ private fun FilterStrip(preview: Bitmap?, selected: Int, onSelect: (Int) -> Unit
                 ) {
                     if (small != null) {
                         Image(
-                            small, f.name, Modifier.fillMaxSize(),
+                            small, str(f.name), Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             colorFilter = f.matrix?.let { ColorFilter.colorMatrix(androidx.compose.ui.graphics.ColorMatrix(it)) },
                         )
                     }
                 }
                 Text(
-                    f.name, Modifier.padding(top = 4.dp),
+                    str(f.name), Modifier.padding(top = 4.dp),
                     color = if (i == selected) Color.White else Color.White.copy(alpha = 0.65f),
                     fontSize = 12.sp,
                     fontWeight = if (i == selected) FontWeight.SemiBold else FontWeight.Normal,

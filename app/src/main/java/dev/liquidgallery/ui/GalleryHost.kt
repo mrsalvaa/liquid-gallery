@@ -65,6 +65,9 @@ import dev.liquidgallery.ui.screens.LocalSelectionBar
 import dev.liquidgallery.ui.screens.LocalToast
 import dev.liquidgallery.ui.screens.SelectionBarSpec
 import dev.liquidgallery.ui.screens.ToastHost
+import dev.liquidgallery.R
+import dev.liquidgallery.util.str
+import dev.liquidgallery.util.plural
 
 /**
  * Lo común a las dos actividades: menús, diálogos, avisos, barra de selección y las acciones
@@ -135,19 +138,18 @@ private fun BoxScope.SelectionBars(spec: SelectionBarSpec?) {
                 Box(
                     Modifier.size(44.dp).clickable(remember { MutableInteractionSource() }, null) { s.selection.clear() },
                     contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Rounded.Close, "Cerrar", tint = p.content) }
+                ) { Icon(Icons.Rounded.Close, str(R.string.close), tint = p.content) }
                 Text(
                     when (count) {
-                        0 -> "Selecciona elementos"
-                        1 -> "1 seleccionado"
-                        else -> "$count seleccionados"
+                        0 -> str(R.string.select_items)
+                        else -> plural(R.plurals.selected, count)
                     },
                     Modifier.weight(1f).padding(start = 4.dp),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
                 val all = total > 0 && count == total
-                GlassChip("Todo", all, {
+                GlassChip(str(R.string.all), all, {
                     s.selection.ids = if (all) emptySet() else s.all().mapTo(HashSet()) { it.id }
                 })
             }

@@ -13,6 +13,10 @@ data class AppSettings(
     /** Color de énfasis en ARGB, para backgroundMode = 1. */
     val accentColor: Long = 0xFF0EA5E9,
     val animatedBackground: Boolean = true,
+    /** Estilo de interfaz: 0 = Liquid Glass, 1 = sólido. */
+    val uiStyle: Int = 0,
+    /** Color de énfasis del estilo sólido, en ARGB (aparte del de Liquid Glass). */
+    val solidAccent: Long = 0xFF0EA5E9,
     /** Columnas de la cuadrícula de imágenes (se cambia pellizcando). */
     val gridColumns: Int = 4,
     /** Columnas de la cuadrícula de álbumes. */

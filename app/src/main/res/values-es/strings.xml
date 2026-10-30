@@ -270,6 +270,10 @@
     <string name="about">Acerca de</string>
     <string name="version">Versión %s</string>
     <string name="about_text">Software libre bajo la licencia GPL-3.0. No pide permiso de internet, no tiene anuncios ni rastreo. La papelera y los favoritos son los de Android, así que se comparten con otras galerías.</string>
+    <string name="ui_style">Estilo de interfaz</string>
+    <string name="ui_style_liquid">Liquid Glass</string>
+    <string name="ui_style_solid">Sólido</string>
+    <string name="ui_style_solid_hint">Tarjetas opacas sobre fondo liso, sin efectos de cristal.</string>
     <string name="theme">Tema</string>
     <string name="theme_system">Sistema</string>
     <string name="theme_light">Claro</string>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Interface style: besides Liquid Glass (the default, with all its usual options) there is "Solid",
+  with opaque cards on a plain background and no glass effects: less rounded corners, rectangular
+  buttons, outline icons and a docked bottom bar. It has light or dark theme and its own accent colour.
+
 ## 0.5.0
 
 - The app follows the phone's language: Spanish on phones set to Spanish, English everywhere else.

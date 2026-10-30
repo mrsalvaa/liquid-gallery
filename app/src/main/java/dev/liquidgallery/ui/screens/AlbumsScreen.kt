@@ -107,6 +107,7 @@ import dev.liquidgallery.util.thumb
 import kotlin.math.roundToInt
 import dev.liquidgallery.R
 import dev.liquidgallery.util.str
+import dev.liquidgallery.ui.glass.styled
 
 private val ALBUM_COLUMNS = listOf(2, 3, 4)
 
@@ -393,7 +394,7 @@ private fun AlbumCard(
             }
             if (icon != null || cover == null) {
                 Icon(
-                    icon ?: Icons.Rounded.PhotoAlbum, null,
+                    styled(icon ?: Icons.Rounded.PhotoAlbum), null,
                     Modifier.align(if (cover == null) Alignment.Center else Alignment.BottomStart).padding(8.dp).size(if (cover == null) 36.dp else 20.dp),
                     tint = if (cover == null) p.contentSecondary else Color.White,
                 )
@@ -443,7 +444,7 @@ private fun GroupCard(name: String, albums: List<Album>, onClick: () -> Unit, on
             }
         }
         Row(Modifier.padding(start = 4.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.Folder, null, Modifier.size(16.dp), tint = p.accentFg)
+            Icon(styled(Icons.Rounded.Folder), null, Modifier.size(16.dp), tint = p.accentFg)
             Spacer(Modifier.width(4.dp))
             Text(name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -584,7 +585,7 @@ fun ReorderAlbumsScreen(padding: PaddingValues, onBack: () -> Unit) {
                     Text(countLabel(a.count), fontSize = 13.sp, color = p.contentSecondary)
                 }
                 Icon(
-                    Icons.Rounded.DragHandle, str(R.string.drag),
+                    styled(Icons.Rounded.DragHandle), str(R.string.drag),
                     Modifier
                         .size(44.dp)
                         .padding(10.dp)

@@ -99,6 +99,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import dev.liquidgallery.ui.glass.styled
 
 /** Columnas posibles al pellizcar, como en Samsung. Desde 6 se agrupa por meses. */
 val GRID_COLUMNS = listOf(2, 3, 4, 6, 8)
@@ -479,7 +480,7 @@ fun CheckCircle(checked: Boolean, modifier: Modifier = Modifier, size: Int = 22)
             .border(1.5.dp, if (checked) p.accent else Color.White.copy(alpha = 0.9f), CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        if (checked) Icon(Icons.Rounded.Check, null, Modifier.size((size * 0.7f).dp), tint = p.onAccent)
+        if (checked) Icon(styled(Icons.Rounded.Check), null, Modifier.size((size * 0.7f).dp), tint = p.onAccent)
     }
 }
 
@@ -531,17 +532,17 @@ private fun Thumbnail(
             ) {
                 if (m.isVideo) {
                     Text(duration(m.duration), fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.SemiBold)
-                    Icon(Icons.Rounded.PlayArrow, null, Modifier.size(14.dp), tint = Color.White)
+                    Icon(styled(Icons.Rounded.PlayArrow), null, Modifier.size(14.dp), tint = Color.White)
                 } else {
                     Text("GIF", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         } else if (small && m.isVideo) {
-            Icon(Icons.Rounded.PlayArrow, null, Modifier.align(Alignment.BottomEnd).size(14.dp), tint = Color.White)
+            Icon(styled(Icons.Rounded.PlayArrow), null, Modifier.align(Alignment.BottomEnd).size(14.dp), tint = Color.White)
         }
         if (!small && m.favorite && !selecting) {
             Icon(
-                Icons.Rounded.Favorite, null,
+                styled(Icons.Rounded.Favorite), null,
                 Modifier.align(Alignment.BottomStart).padding(5.dp).size(13.dp),
                 tint = Color.White,
             )

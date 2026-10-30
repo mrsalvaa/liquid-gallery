@@ -1,5 +1,12 @@
 # Registro de cambios
 
+## 0.6.0
+
+- Estilo de interfaz: además de Liquid Glass (el predeterminado, con todas sus opciones de siempre)
+  está «Sólido», con tarjetas opacas sobre fondo liso y sin efectos de cristal: esquinas menos
+  redondeadas, botones rectangulares, iconos de líneas y barra inferior acoplada. Tiene tema claro u
+  oscuro y su propio color de énfasis.
+
 ## 0.5.0
 
 - La app sigue el idioma del teléfono: español si el móvil está en español, inglés en el resto.

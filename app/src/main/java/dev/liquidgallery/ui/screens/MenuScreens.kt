@@ -82,6 +82,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDate
 import dev.liquidgallery.R
 import dev.liquidgallery.util.str
+import dev.liquidgallery.ui.glass.styled
 
 // --- Permisos ---
 
@@ -145,7 +146,7 @@ fun PermissionScreen(padding: PaddingValues, onChanged: () -> Unit) {
     }
     Box(Modifier.fillMaxSize().padding(padding).padding(24.dp), contentAlignment = Alignment.Center) {
         GlassCard {
-            Icon(Icons.Rounded.PhotoLibrary, null, Modifier.size(48.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
+            Icon(styled(Icons.Rounded.PhotoLibrary), null, Modifier.size(48.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
             Text(
                 str(R.string.permission_title),
                 Modifier.fillMaxWidth().padding(top = 12.dp),
@@ -237,7 +238,7 @@ fun MenuScreen(
         Spacer(Modifier.height(14.dp))
         GlassCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Rounded.Shield, null, Modifier.size(22.dp), tint = p.accentFg)
+                Icon(styled(Icons.Rounded.Shield), null, Modifier.size(22.dp), tint = p.accentFg)
                 Spacer(Modifier.width(12.dp))
                 Text(
                     str(R.string.about_short),
@@ -258,11 +259,11 @@ private fun MenuRow(icon: ImageVector, title: String, value: String?, onClick: (
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, null, Modifier.size(24.dp), tint = p.accentFg)
+        Icon(styled(icon), null, Modifier.size(24.dp), tint = p.accentFg)
         Spacer(Modifier.width(16.dp))
         Text(title, Modifier.weight(1f), fontSize = 17.sp, fontWeight = FontWeight.Medium)
         if (value != null) Text(value, fontSize = 15.sp, color = p.contentSecondary)
-        Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null, Modifier.size(22.dp), tint = p.contentSecondary)
+        Icon(styled(Icons.AutoMirrored.Rounded.KeyboardArrowRight), null, Modifier.size(22.dp), tint = p.contentSecondary)
     }
 }
 

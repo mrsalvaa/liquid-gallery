@@ -150,6 +150,7 @@ import kotlin.math.roundToInt
 import dev.liquidgallery.R
 import dev.liquidgallery.util.str
 import dev.liquidgallery.util.plural
+import dev.liquidgallery.ui.glass.styled
 
 /**
  * Visor a pantalla completa. [external] se usa al abrir un archivo desde otra app que no está en
@@ -435,7 +436,7 @@ private fun BarButton(icon: ImageVector, label: String, tint: Color, onClick: ()
             .clickable(remember { MutableInteractionSource() }, null, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, label, Modifier.size(26.dp), tint = tint)
+        Icon(styled(icon), label, Modifier.size(26.dp), tint = tint)
     }
 }
 
@@ -521,7 +522,7 @@ private fun VideoPage(m: Media, player: ExoPlayer, playing: Boolean, onPlay: () 
                 tint = Color.Black.copy(alpha = 0.25f),
                 onClick = onPlay,
             ) {
-                Icon(Icons.Rounded.PlayArrow, str(R.string.play), Modifier.align(Alignment.Center).size(40.dp), tint = Color.White)
+                Icon(styled(Icons.Rounded.PlayArrow), str(R.string.play), Modifier.align(Alignment.Center).size(40.dp), tint = Color.White)
             }
         }
     }

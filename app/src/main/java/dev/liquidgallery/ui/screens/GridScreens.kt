@@ -68,6 +68,7 @@ import dev.liquidgallery.util.countLabel
 import java.util.concurrent.TimeUnit
 import dev.liquidgallery.R
 import dev.liquidgallery.util.str
+import dev.liquidgallery.ui.glass.styled
 
 /** Acciones de la barra de selección en las cuadrículas normales. */
 @Composable
@@ -383,7 +384,7 @@ fun VaultLocked(padding: PaddingValues, onBack: () -> Unit) {
         BackTitle(str(R.string.hidden), onBack)
         Box(Modifier.fillMaxWidth().padding(top = 60.dp)) {
             GlassCard {
-                Icon(Icons.Rounded.Lock, null, Modifier.size(44.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
+                Icon(styled(Icons.Rounded.Lock), null, Modifier.size(44.dp).align(Alignment.CenterHorizontally), tint = p.accentFg)
                 Text(
                     str(R.string.vault_locked),
                     Modifier.fillMaxWidth().padding(top = 12.dp),

@@ -75,6 +75,8 @@ import dev.liquidgallery.data.Stores
 import dev.liquidgallery.data.VaultLock
 import dev.liquidgallery.ui.GalleryHost
 import dev.liquidgallery.ui.SystemBarsFor
+import dev.liquidgallery.ui.glass.FlatNavBar
+import dev.liquidgallery.ui.glass.FlatNavBarHeight
 import dev.liquidgallery.ui.glass.GlassNavBar
 import dev.liquidgallery.ui.glass.GlassTheme
 import dev.liquidgallery.ui.glass.LocalTabActive
@@ -127,7 +129,7 @@ class MainActivity : FragmentActivity() {
             val settings by Stores.settings.state.collectAsStateWithLifecycle()
             SystemBarsFor(isDarkTheme(settings.themeMode))
             GlassTheme(settings) {
-                App(consent, settings.animatedBackground)
+                App(consent, settings.animatedBackground, flatNav = settings.uiStyle == 1)
             }
         }
     }
@@ -140,7 +142,7 @@ class MainActivity : FragmentActivity() {
 }
 
 @Composable
-private fun App(consent: ConsentRunner, animated: Boolean) {
+private fun App(consent: ConsentRunner, animated: Boolean, flatNav: Boolean) {
     var tab by rememberSaveable { mutableIntStateOf(TAB_PHOTOS) }
     // Posición de la barra mientras se desliza entre pestañas (p. ej. 1,4), o null.
     var tabDrag by remember { mutableStateOf<Float?>(null) }
@@ -165,7 +167,8 @@ private fun App(consent: ConsentRunner, animated: Boolean) {
 
     val insets = WindowInsets.safeDrawing.asPaddingValues()
     val dir = LocalLayoutDirection.current
-    val navHeight = 70.dp + 12.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    // Barra flotante: 70 + 12 de margen; plana (estilo sólido): pegada abajo.
+    val navHeight = (if (flatNav) FlatNavBarHeight else 70.dp + 12.dp) + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val tabPadding = PaddingValues(
         top = insets.calculateTopPadding(),
         bottom = navHeight + 16.dp,
@@ -193,17 +196,22 @@ private fun App(consent: ConsentRunner, animated: Boolean) {
                 enter = fadeIn() + slideInVertically { it / 2 },
                 exit = fadeOut() + slideOutVertically { it / 2 },
             ) {
-                GlassNavBar(
-                    items = listOf(
-                        NavItem(str(R.string.tab_photos), Icons.Rounded.Photo),
-                        NavItem(str(R.string.tab_albums), Icons.Rounded.PhotoAlbum),
-                        NavItem(str(R.string.more), Icons.Rounded.Menu),
-                    ),
-                    selected = tab,
-                    dragPosition = { tabDrag },
-                    onSelect = { tab = it },
-                    modifier = Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
+                val navItems = listOf(
+                    NavItem(str(R.string.tab_photos), Icons.Rounded.Photo),
+                    NavItem(str(R.string.tab_albums), Icons.Rounded.PhotoAlbum),
+                    NavItem(str(R.string.more), Icons.Rounded.Menu),
                 )
+                if (flatNav) {
+                    FlatNavBar(navItems, selected = tab, onSelect = { tab = it })
+                } else {
+                    GlassNavBar(
+                        items = navItems,
+                        selected = tab,
+                        dragPosition = { tabDrag },
+                        onSelect = { tab = it },
+                        modifier = Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
+                    )
+                }
             }
         },
     ) {

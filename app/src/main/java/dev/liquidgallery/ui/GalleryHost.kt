@@ -68,6 +68,7 @@ import dev.liquidgallery.ui.screens.ToastHost
 import dev.liquidgallery.R
 import dev.liquidgallery.util.str
 import dev.liquidgallery.util.plural
+import dev.liquidgallery.ui.glass.styled
 
 /**
  * Lo común a las dos actividades: menús, diálogos, avisos, barra de selección y las acciones
@@ -138,7 +139,7 @@ private fun BoxScope.SelectionBars(spec: SelectionBarSpec?) {
                 Box(
                     Modifier.size(44.dp).clickable(remember { MutableInteractionSource() }, null) { s.selection.clear() },
                     contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Rounded.Close, str(R.string.close), tint = p.content) }
+                ) { Icon(styled(Icons.Rounded.Close), str(R.string.close), tint = p.content) }
                 Text(
                     when (count) {
                         0 -> str(R.string.select_items)
@@ -185,7 +186,7 @@ private fun BoxScope.SelectionBars(spec: SelectionBarSpec?) {
                         verticalArrangement = Arrangement.Center,
                     ) {
                         val tint = if (action.danger) p.danger else p.content
-                        Icon(action.icon, null, Modifier.size(24.dp), tint = tint)
+                        Icon(styled(action.icon), null, Modifier.size(24.dp), tint = tint)
                         Spacer(Modifier.height(2.dp))
                         Text(action.label, fontSize = 11.sp, color = tint, fontWeight = FontWeight.Medium, maxLines = 1)
                     }

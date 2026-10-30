@@ -7,8 +7,25 @@ Installs on the phone as **Gallery** (*Galería* in Spanish).
 A free, tracker-free Android gallery inspired by Samsung's, with the same liquid-glass interface
 as [Liquid Clock](https://github.com/mrsalvaa/liquid-clock): surfaces that refract what's behind them (thanks to
 [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)) and buttons that squish like a droplet.
+If you'd rather have something plainer, Settings has a Solid style: opaque cards, small corners and
+outline icons.
 
 **It doesn't request the internet permission**, and has no ads or telemetry. Licensed under GPL-3.0.
+
+<p align="center"><b>Liquid Glass</b></p>
+<p align="center">
+  <img src="docs/screenshots/photos.png" width="200" alt="Pictures">
+  <img src="docs/screenshots/albums.png" width="200" alt="Albums">
+  <img src="docs/screenshots/more.png" width="200" alt="More">
+</p>
+<p align="center"><b>Solid</b></p>
+<p align="center">
+  <img src="docs/screenshots/photos-solid.png" width="200" alt="Pictures">
+  <img src="docs/screenshots/albums-solid.png" width="200" alt="Albums">
+  <img src="docs/screenshots/more-solid.png" width="200" alt="More">
+</p>
+
+Screenshots use made-up sample images.
 
 ## Features
 
@@ -35,7 +52,7 @@ Get the APK from [Releases](../../releases) and install it (Android 12 or later)
 Check the file wasn't altered:
 
 ```bash
-sha256sum -c liquid-gallery-v0.5.0.apk.sha256
+sha256sum -c liquid-gallery-v0.6.0.apk.sha256
 ```
 
 And that it's signed with the project key (certificate SHA-256 fingerprint):
@@ -45,7 +62,7 @@ And that it's signed with the project key (certificate SHA-256 fingerprint):
 ```
 
 ```bash
-apksigner verify --print-certs liquid-gallery-v0.5.0.apk
+apksigner verify --print-certs liquid-gallery-v0.6.0.apk
 ```
 
 ## Build

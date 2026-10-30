@@ -7,9 +7,25 @@ Se instala en el móvil como **Galería** (o *Gallery*, según el idioma).
 Galería para Android libre y sin rastreo, inspirada en la de Samsung y con la misma interfaz de
 cristal líquido que [Liquid Clock](https://github.com/mrsalvaa/liquid-clock): superficies que refractan lo que tienen detrás
 (gracias a [Backdrop](https://github.com/Kyant0/AndroidLiquidGlass)) y botones que se deforman como
-una gota al pulsarlos.
+una gota al pulsarlos. Si prefieres algo más sobrio, en Ajustes puedes pasar al estilo Sólido:
+tarjetas opacas, esquinas pequeñas e iconos de líneas.
 
 **No pide permiso de internet**, no tiene anuncios ni telemetría. Publicada bajo GPL-3.0.
+
+<p align="center"><b>Liquid Glass</b></p>
+<p align="center">
+  <img src="docs/screenshots/photos.png" width="200" alt="Imágenes">
+  <img src="docs/screenshots/albums.png" width="200" alt="Álbumes">
+  <img src="docs/screenshots/more.png" width="200" alt="Más">
+</p>
+<p align="center"><b>Sólido</b></p>
+<p align="center">
+  <img src="docs/screenshots/photos-solid.png" width="200" alt="Imágenes">
+  <img src="docs/screenshots/albums-solid.png" width="200" alt="Álbumes">
+  <img src="docs/screenshots/more-solid.png" width="200" alt="Más">
+</p>
+
+Las capturas usan imágenes de muestra inventadas.
 
 ## Funciones
 
@@ -63,7 +79,7 @@ Descarga el APK desde [Releases](../../releases) e instálalo (Android 12 o supe
 Comprueba que el archivo no está alterado:
 
 ```bash
-sha256sum -c liquid-gallery-v0.5.0.apk.sha256
+sha256sum -c liquid-gallery-v0.6.0.apk.sha256
 ```
 
 Y que está firmado con la clave del proyecto (huella SHA-256 del certificado):
@@ -73,7 +89,7 @@ Y que está firmado con la clave del proyecto (huella SHA-256 del certificado):
 ```
 
 ```bash
-apksigner verify --print-certs liquid-gallery-v0.5.0.apk
+apksigner verify --print-certs liquid-gallery-v0.6.0.apk
 ```
 
 ## Compilar

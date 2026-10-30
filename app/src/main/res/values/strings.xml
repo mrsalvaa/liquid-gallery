@@ -258,6 +258,10 @@
     <string name="about">About</string>
     <string name="version">Version %s</string>
     <string name="about_text">Free software under the GPL-3.0 license. It doesn\'t request internet access and has no ads or tracking. The trash and favorites are Android\'s own, so they\'re shared with other galleries.</string>
+    <string name="ui_style">Interface style</string>
+    <string name="ui_style_liquid">Liquid Glass</string>
+    <string name="ui_style_solid">Solid</string>
+    <string name="ui_style_solid_hint">Opaque cards on a plain background, no glass effects.</string>
     <string name="theme">Theme</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>

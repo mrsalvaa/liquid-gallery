@@ -1,11 +1,12 @@
 package dev.liquidgallery.ui.glass
 
 import android.os.SystemClock
+import android.provider.Settings
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,15 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,15 +34,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
-import dev.liquidgallery.data.AppSettings
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import dev.liquidgallery.R
+import dev.liquidgallery.data.AppSettings
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
-import dev.liquidgallery.R
+import kotlinx.coroutines.delay
 
 @Immutable
 data class GlassPalette(
@@ -216,6 +220,15 @@ val SolidLight = LightGlass.copy(
     outline = Color.Black.copy(alpha = 0.06f),
 )
 
+fun GlassPalette.accentFill(): Color = if (solid) accent else accent.copy(alpha = if (dark) 0.6f else 0.92f)
+
+/**
+ * Velo de las píldoras flotantes (la de pestañas y las de selección). Con fondo liso en claro la
+ * paleta lleva 85 % de blanco y tapa la refracción, que en oscuro sí se ve (9 %): ahí, y solo ahí,
+ * llevan menos para que se note lo que pasa por debajo. null = el velo normal de la paleta.
+ */
+fun GlassPalette.pillVeil(): Color? = if (!dark && !solid && blobs.isEmpty()) Color.White.copy(alpha = 0.3f) else null
+
 val LocalGlass = staticCompositionLocalOf { DarkGlass }
 
 /** false en las pestañas ocultas: sirve para pausar lo que se refresca en cada fotograma. */
@@ -231,6 +244,43 @@ fun isDarkTheme(themeMode: Int): Boolean = when (themeMode) {
     else -> isSystemInDarkTheme()
 }
 
+/** Modo liso, oscuro: fondo casi negro sin manchas y azul claro como acento. */
+val PlainDarkGlass = DarkGlass.copy(
+    base = Color(0xFF0E0F12),
+    tint = Color.White.copy(alpha = 0.05f),
+    tintStrong = Color.White.copy(alpha = 0.09f),
+    accent = Color(0xFF8AB4F8),
+    blobs = emptyList(),
+)
+
+/** Modo liso, claro: fondo gris muy claro sin manchas y azul intenso como acento. */
+val PlainLightGlass = LightGlass.copy(
+    base = Color(0xFFF2F3F5),
+    content = Color(0xFF111318),
+    contentSecondary = Color(0xFF111318).copy(alpha = 0.58f),
+    tint = Color.White.copy(alpha = 0.7f),
+    tintStrong = Color.White.copy(alpha = 0.85f),
+    accent = Color(0xFF1A73E8),
+    blobs = emptyList(),
+)
+
+/** True dentro de lo que flota sobre la página (refracta el contenido). */
+val LocalFloating = staticCompositionLocalOf { false }
+
+val LocalReducedMotion = staticCompositionLocalOf { false }
+
+@Composable
+fun rememberReducedMotion(): Boolean {
+    val resolver = LocalContext.current.contentResolver
+    fun read() = Settings.Global.getFloat(resolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+    var reduced by remember { mutableStateOf(read()) }
+    LifecycleResumeEffect(resolver) {
+        reduced = read()
+        onPauseOrDispose {}
+    }
+    return reduced
+}
+
 @Composable
 fun GlassTheme(settings: AppSettings, content: @Composable () -> Unit) {
     val dark = isDarkTheme(settings.themeMode)
@@ -239,6 +289,9 @@ fun GlassTheme(settings: AppSettings, content: @Composable () -> Unit) {
         val solid = if (dark) SolidDark else SolidLight
         val accent = muted(Color(settings.solidAccent))
         solid.copy(accent = accent, onAccent = readableOn(accent))
+    } else if (settings.backgroundMode == 2) {
+        val plain = if (dark) PlainDarkGlass else PlainLightGlass
+        plain.copy(onAccent = onAccentGlass(plain.accent, plain.base))
     } else if (settings.backgroundMode == 1) {
         val accent = muted(Color(settings.accentColor))
         base.copy(accent = accent, onAccent = onAccentGlass(accent, base.base), blobs = listOf(accent), accentGlow = true)
@@ -271,6 +324,7 @@ fun GlassTheme(settings: AppSettings, content: @Composable () -> Unit) {
         CompositionLocalProvider(
             LocalGlass provides palette,
             LocalContentColor provides p.content,
+            LocalReducedMotion provides rememberReducedMotion(),
             content = content,
         )
     }
@@ -304,7 +358,7 @@ fun GlassRoot(
                 .windowInsetsTopHeight(WindowInsets.statusBars)
                 .background(Brush.verticalGradient(listOf(p.base, p.base.copy(alpha = 0.6f)))),
         )
-        CompositionLocalProvider(LocalBackdrop provides page) {
+        CompositionLocalProvider(LocalBackdrop provides page, LocalFloating provides true) {
             Box(Modifier.fillMaxSize(), content = floating)
         }
     }

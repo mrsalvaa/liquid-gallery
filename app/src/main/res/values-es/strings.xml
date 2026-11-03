@@ -316,4 +316,6 @@
     <string name="kw_gif">gif animado</string>
     <string name="kw_screenshot">captura capturas pantalla</string>
     <string name="kw_favorite">favorito favoritos</string>
+    <string name="background_plain">Liso</string>
+    <string name="background_plain_hint">Fondo liso con el azul del tema: más claro en oscuro, más intenso en claro.</string>
 </resources>

@@ -304,4 +304,6 @@
     <string name="kw_gif">gif animated</string>
     <string name="kw_screenshot">screenshot screenshots screen capture</string>
     <string name="kw_favorite">favorite favorites favourite</string>
+    <string name="background_plain">Plain</string>
+    <string name="background_plain_hint">Plain background with the theme\'s blue: lighter in dark mode, deeper in light mode.</string>
 </resources>

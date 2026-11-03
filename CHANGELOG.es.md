@@ -1,5 +1,11 @@
 # Registro de cambios
 
+## 0.7.0
+
+- Fondo liso: nueva opción en Ajustes, como en las demás apps de la suite.
+- Las barras de selección de arriba y abajo ahora tienen el mismo cristal líquido que la barra de pestañas, también con fondo liso en tema claro.
+- Cristal y controles al día con el resto de la suite; las animaciones respetan el ajuste del sistema para quitarlas.
+
 ## 0.6.0
 
 - Estilo de interfaz: además de Liquid Glass (el predeterminado, con todas sus opciones de siempre)

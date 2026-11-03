@@ -77,8 +77,11 @@ fun AppearanceCard(s: AppSettings, edit: ((AppSettings) -> AppSettings) -> Unit)
             AccentPicker(s.solidAccent) { c -> edit { it.copy(solidAccent = c) } }
         } else {
             Label(str(R.string.background))
-            ChipRow(listOf(0, 1), s.backgroundMode, { str(listOf(R.string.background_moving, R.string.background_accent)[it]) }) { v ->
+            ChipRow(listOf(2, 0, 1), s.backgroundMode, { str(listOf(R.string.background_moving, R.string.background_accent, R.string.background_plain)[it]) }) { v ->
                 edit { it.copy(backgroundMode = v) }
+            }
+            if (s.backgroundMode == 2) {
+                Text(str(R.string.background_plain_hint), Modifier.padding(top = 4.dp), fontSize = 13.sp, color = p.contentSecondary)
             }
 
             if (s.backgroundMode == 0) {

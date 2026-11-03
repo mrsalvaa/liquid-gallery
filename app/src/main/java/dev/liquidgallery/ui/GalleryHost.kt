@@ -53,6 +53,7 @@ import dev.liquidgallery.ui.glass.ActionSheetHost
 import dev.liquidgallery.ui.glass.GlassChip
 import dev.liquidgallery.ui.glass.GlassRoot
 import dev.liquidgallery.ui.glass.GlassSurface
+import dev.liquidgallery.ui.glass.pillVeil
 import dev.liquidgallery.ui.glass.LocalActionSheet
 import dev.liquidgallery.ui.glass.LocalGlass
 import dev.liquidgallery.ui.glass.LocalPrompt
@@ -133,7 +134,8 @@ private fun BoxScope.SelectionBars(spec: SelectionBarSpec?) {
             Modifier.statusBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth().height(60.dp),
             shape = CircleShape,
             strong = true,
-            frost = 6.dp,
+            tint = p.pillVeil(),
+            frost = 4.dp,
         ) {
             Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -168,6 +170,7 @@ private fun BoxScope.SelectionBars(spec: SelectionBarSpec?) {
             Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth().height(70.dp),
             shape = CircleShape,
             strong = true,
+            tint = p.pillVeil(),
             frost = 4.dp,
         ) {
             Row(

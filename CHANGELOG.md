@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- Plain background: a new option in Settings, as in the other apps of the suite.
+- The top and bottom selection bars now have the same liquid glass as the tab bar, also on the plain background in light theme.
+- Glass and controls updated to match the rest of the suite; animations follow the system setting to remove them.
+
 ## 0.6.0
 
 - Interface style: besides Liquid Glass (the default, with all its usual options) there is "Solid",

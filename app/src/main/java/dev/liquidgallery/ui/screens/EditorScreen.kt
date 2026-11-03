@@ -316,7 +316,7 @@ fun EditorScreen(media: Media, onClose: () -> Unit, onSaved: () -> Unit) {
             }
 
             // Imagen.
-            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1f).fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
                 val img = oriented
                 if (img == null) {
                     CircularProgressIndicator(color = p.accent)

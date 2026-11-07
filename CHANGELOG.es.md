@@ -1,6 +1,6 @@
 # Registro de cambios
 
-## Sin publicar
+## 0.7.3
 
 - Tocar cualquier parte de una miniatura la abre, también los bordes (el de abajo no hacía nada).
 - Detalles: la foto y la tarjeta siguen al dedo al deslizar hacia arriba para abrirlos y hacia abajo para cerrarlos, y al soltar terminan desde ahí, sin saltos.

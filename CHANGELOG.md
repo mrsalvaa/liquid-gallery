@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.3
 
 - Tapping anywhere on a thumbnail opens it, edges included (the bottom edge did nothing).
 - Details: the photo and the card follow the finger when swiping up to open them and down to close them, and finish from there when released, without jumps.

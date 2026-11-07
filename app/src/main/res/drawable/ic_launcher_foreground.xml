@@ -37,7 +37,7 @@
     </path>
     <!-- Sol -->
     <path
-        android:fillColor="#FFF472B6"
+        android:fillColor="#FFFF4D6D"
         android:pathData="M64,47m-4.2,0a4.2,4.2 0,1 1,8.4 0a4.2,4.2 0,1 1,-8.4 0" />
     <!-- Montañas -->
     <path

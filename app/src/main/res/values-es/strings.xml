@@ -280,7 +280,7 @@
     <string name="theme_dark">Oscuro</string>
     <string name="background">Fondo</string>
     <string name="background_moving">En movimiento</string>
-    <string name="background_accent">Color de énfasis</string>
+    <string name="background_accent">Énfasis</string>
     <string name="animated_background">Fondo animado</string>
     <string name="animated_background_hint">Desactívalo para ahorrar batería</string>
     <string name="tone">Tono</string>

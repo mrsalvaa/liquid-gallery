@@ -268,7 +268,7 @@
     <string name="theme_dark">Dark</string>
     <string name="background">Background</string>
     <string name="background_moving">Moving</string>
-    <string name="background_accent">Accent color</string>
+    <string name="background_accent">Accent</string>
     <string name="animated_background">Animated background</string>
     <string name="animated_background_hint">Turn it off to save battery</string>
     <string name="tone">Shade</string>

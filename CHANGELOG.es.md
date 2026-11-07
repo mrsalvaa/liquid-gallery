@@ -1,5 +1,10 @@
 # Registro de cambios
 
+## 0.7.2
+
+- Iconos nuevos. El predeterminado (Liquid) tiene un fondo grafito, más sobrio, en vez del brillo celeste y rosa, y su detalle de color ahora es el mismo rojo en toda la suite. El de estilo Material es de un color pleno con el dibujo en blanco y más pequeño, sin el marco celeste.
+- Ajustes: "Color de énfasis" ahora es solo "Énfasis".
+
 ## 0.7.1
 
 - Las fotos nuevas (por ejemplo, recién sacadas con la cámara) aparecen al volver a la galería, sin tener que cerrarla y abrirla.

@@ -25,8 +25,8 @@ android {
         applicationId = "dev.liquidgallery"
         minSdk = 31
         targetSdk = 35
-        versionCode = 7
-        versionName = "0.7.1"
+        versionCode = 8
+        versionName = "0.7.2"
     }
 
     signingConfigs {

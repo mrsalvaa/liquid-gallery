@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:pathData="M38,34h32a8,8 0,0 1,8 8v24a8,8 0,0 1,-8 8h-32a8,8 0,0 1,-8 -8v-24a8,8 0,0 1,8 -8z"
-        android:fillColor="#FF0B57D0" />
-    <path
-        android:pathData="M64,46.5m-4,0a4,4 0,1 1,8,0a4,4 0,1 1,-8,0"
-        android:fillColor="#FFD3E3FD" />
-    <path
-        android:pathData="M30,63L44,52l9,9.5l5,-5l20,7.5V66a8,8 0,0 1,-8 8h-32a8,8 0,0 1,-8 -8z"
-        android:fillColor="#FFFFFFFF" />
+    <!-- Dibujo al 78 %: deja aire alrededor, como en Fossify -->
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.78" android:scaleY="0.78">
+    <!-- Sombra suave hacia abajo -->
+    <group android:translateX="1.2" android:translateY="2.2">
+    <path android:pathData="M37,32h34a9,9 0,0 1,9,9v26a9,9 0,0 1,-9,9h-34a9,9 0,0 1,-9,-9v-26a9,9 0,0 1,9,-9z" android:fillColor="#33000000" />
+    </group>
+    <!-- Dibujo en blanco; los detalles se recortan con el color del fondo -->
+    <path android:pathData="M37,32h34a9,9 0,0 1,9,9v26a9,9 0,0 1,-9,9h-34a9,9 0,0 1,-9,-9v-26a9,9 0,0 1,9,-9z" android:fillColor="#FFFFFFFF" />
+    <path android:pathData="M65,45m-4.5,0a4.5,4.5 0,1 1,9,0a4.5,4.5 0,1 1,-9,0" android:fillColor="#FFD6409F" />
+    <path android:pathData="M35,70L46,57l8,9l5,-5l14,9z" android:fillColor="#FFD6409F" />
+    </group>
 </vector>

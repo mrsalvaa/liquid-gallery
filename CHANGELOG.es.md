@@ -1,5 +1,10 @@
 # Registro de cambios
 
+## Sin publicar
+
+- Tocar cualquier parte de una miniatura la abre, también los bordes (el de abajo no hacía nada).
+- Detalles: la foto y la tarjeta siguen al dedo al deslizar hacia arriba para abrirlos y hacia abajo para cerrarlos, y al soltar terminan desde ahí, sin saltos.
+
 ## 0.7.2
 
 - Iconos nuevos. El predeterminado (Liquid) tiene un fondo grafito, más sobrio, en vez del brillo celeste y rosa, y su detalle de color ahora es el mismo rojo en toda la suite. El de estilo Material es de un color pleno con el dibujo en blanco y más pequeño, sin el marco celeste.

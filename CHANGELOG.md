@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Tapping anywhere on a thumbnail opens it, edges included (the bottom edge did nothing).
+- Details: the photo and the card follow the finger when swiping up to open them and down to close them, and finish from there when released, without jumps.
+
 ## 0.7.2
 
 - New app icons. The default (Liquid) icon has a sober graphite background instead of the cyan and pink glow, and its accent is now the same red across the suite. The Material icon is a solid color with a smaller white drawing, without the light-blue frame.

@@ -99,6 +99,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -254,7 +255,31 @@ fun ViewerScreen(
     // cual sea su forma (vertical, apaisada, panorámica).
     var screenH by remember { mutableIntStateOf(1) }
     var cardH by remember { mutableIntStateOf(0) }
-    val lift by animateFloatAsState(if (details) 1f else 0f, spring(dampingRatio = 0.9f, stiffness = 380f), label = "lift")
+    // Cuánto está abierta la vista de detalles (0 = foto entera, 1 = foto arriba y tarjeta abajo).
+    // Un solo valor mueve la foto y la tarjeta, siempre: el dedo lo cambia al deslizar (para
+    // arriba abre, para abajo cierra) y al soltar sigue animándose desde donde quedó, con la
+    // velocidad del gesto. Así nada salta ni vuelve atrás un instante.
+    var lift by remember { mutableFloatStateOf(0f) }
+    var liftTarget by remember { mutableFloatStateOf(0f) }
+    var liftJob by remember { mutableStateOf<Job?>(null) }
+    fun animateLift(target: Float, velocity: Float = 0f) {
+        liftTarget = target
+        liftJob?.cancel()
+        liftJob = scope.launch {
+            animate(lift, target, velocity, spring(dampingRatio = 0.9f, stiffness = 380f)) { v, _ -> lift = v }
+        }
+    }
+    // Abrir o cerrar con un botón, un toque o "atrás": la misma animación, si el gesto no la empezó.
+    LaunchedEffect(details) {
+        val target = if (details) 1f else 0f
+        if (liftTarget != target) animateLift(target)
+    }
+    // Recorrido del dedo que cierra los detalles del todo: lo que sube la foto al abrirlos.
+    val liftSpan = run {
+        val h = screenH.toFloat()
+        val free = (h - cardH).coerceIn(h * 0.3f, h)
+        ((h - free) / 2f + cardH / 2f).coerceAtLeast(closeAt)
+    }
     val tap: () -> Unit = { if (details) details = false else chrome = !chrome }
 
     val backdrop = rememberLayerBackdrop()
@@ -280,7 +305,7 @@ fun ViewerScreen(
                         val h = screenH.toFloat()
                         val free = (h - cardH).coerceIn(h * 0.3f, h)
                         val fit = 1f + (free / h - 1f) * lift
-                        val shrink = if (details) 1f else 1f - (abs(drag) / (closeAt * 8)).coerceIn(0f, 0.15f)
+                        val shrink = 1f - (abs(drag) / (closeAt * 8)).coerceIn(0f, 0.15f)
                         scaleX = fit * shrink
                         scaleY = fit * shrink
                         translationY = -(h - free) / 2f * lift + drag
@@ -289,21 +314,24 @@ fun ViewerScreen(
                         orientation = Orientation.Vertical,
                         enabled = !zoomed,
                         state = rememberDraggableState { d ->
-                            // Con los detalles abiertos solo se sigue al dedo hacia abajo.
-                            drag = if (details) (drag + d).coerceAtLeast(-closeAt / 4) else drag + d
+                            // Hacia arriba (o con los detalles abiertos o abriéndose) el dedo maneja
+                            // los detalles; hacia abajo desde la foto entera, la arrastra para cerrar.
+                            if (!readOnly && drag == 0f && (details || lift > 0f || d < 0f)) {
+                                lift = (lift - d / liftSpan).coerceIn(0f, 1f)
+                            } else {
+                                drag += d
+                            }
                         },
-                        onDragStarted = { settleJob?.cancel() },
+                        onDragStarted = { settleJob?.cancel(); liftJob?.cancel() },
                         onDragStopped = { v ->
                             when {
-                                details -> {
-                                    if (drag > closeAt / 2 || v > 1500f) details = false
-                                    settle(v)
+                                drag == 0f && (details || lift > 0f) -> {
+                                    // La velocidad en px/s pasa a la escala de lift (hacia arriba abre).
+                                    val open = if (details) lift > 0.6f && v < 1500f else lift > 0.3f || v < -1500f
+                                    details = open
+                                    animateLift(if (open) 1f else 0f, -v / liftSpan)
                                 }
                                 drag > closeAt || v > 2500f -> close()
-                                drag < -closeAt / 2 || v < -2500f -> {
-                                    if (!readOnly) details = true
-                                    settle()
-                                }
                                 else -> settle(v)
                             }
                         },
@@ -416,11 +444,17 @@ fun ViewerScreen(
                 }
             }
 
-            AnimatedVisibility(
-                details,
-                Modifier.align(Alignment.BottomCenter).onSizeChanged { cardH = it.height },
-                enter = fadeIn() + slideInVertically { it },
-                exit = fadeOut() + slideOutVertically { it },
+            // La tarjeta está siempre armada (para saber su alto antes de abrirla) y se mueve con
+            // lift: cerrada queda debajo del borde de la pantalla, invisible y sin TalkBack.
+            Box(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .onSizeChanged { cardH = it.height }
+                    .graphicsLayer {
+                        translationY = (1f - lift) * cardH
+                        alpha = if (lift > 0f && cardH > 0) 1f else 0f
+                    }
+                    .then(if (lift > 0f) Modifier else Modifier.clearAndSetSemantics { }),
             ) {
                 DetailsCard(current) { details = false }
             }

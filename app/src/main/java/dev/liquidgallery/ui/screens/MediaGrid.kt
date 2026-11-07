@@ -252,10 +252,16 @@ fun MediaGrid(
         fun entryAt(pos: Offset): Entry.Cell? {
             val info = state.layoutInfo
             val offset = info.totalItemsCount - latestEntries.size
-            val hit = info.visibleItemsInfo.firstOrNull {
-                pos.x >= it.offset.x && pos.x < it.offset.x + it.size.width &&
-                    pos.y >= it.offset.y && pos.y < it.offset.y + it.size.height
-            } ?: return null
+            // Las posiciones de los elementos empiezan después del margen de arriba de la grilla
+            // (viewportStartOffset es ese margen en negativo): el toque se pasa a esa misma cuenta.
+            val y = pos.y + info.viewportStartOffset
+            // Los 2 dp entre miniaturas también cuentan: el toque va a la más cercana.
+            val gap = info.mainAxisItemSpacing.toFloat()
+            fun inside(it: androidx.compose.foundation.lazy.grid.LazyGridItemInfo, pad: Float) =
+                pos.x >= it.offset.x - pad && pos.x < it.offset.x + it.size.width + pad &&
+                    y >= it.offset.y - pad && y < it.offset.y + it.size.height + pad
+            val cells = info.visibleItemsInfo.filter { latestEntries.getOrNull(it.index - offset) is Entry.Cell }
+            val hit = cells.firstOrNull { inside(it, 0f) } ?: cells.firstOrNull { inside(it, gap) } ?: return null
             return latestEntries.getOrNull(hit.index - offset) as? Entry.Cell
         }
 

@@ -1,5 +1,7 @@
 package dev.liquidgallery.data
 
+import android.app.Activity
+import android.app.Application
 import android.content.ContentUris
 import android.content.Context
 import android.database.ContentObserver
@@ -88,6 +90,12 @@ object MediaRepo {
     private val _loaded = MutableStateFlow(false)
     val loaded: StateFlow<Boolean> = _loaded.asStateFlow()
 
+    /** Generación de MediaStore de la última lectura: si no cambió, no hay nada nuevo. */
+    @Volatile private var generation = -1L
+
+    /** Actividades a la vista: al pasar de 0 a 1, la app volvió al frente. */
+    private var started = 0
+
     fun init(context: Context) {
         app = context.applicationContext
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -96,6 +104,27 @@ object MediaRepo {
         app.contentResolver.registerContentObserver(
             MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), true, observer,
         )
+        // Con la app en segundo plano Android la congela y los avisos del observador se pueden
+        // perder (p. ej. la cámara termina de guardar una foto mientras tanto): al volver al
+        // frente se mira si MediaStore cambió y, si cambió, se vuelve a leer.
+        (app as Application).registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityStarted(activity: Activity) {
+                if (started++ == 0 && generation >= 0 && currentGeneration() != generation) refresh()
+            }
+            override fun onActivityStopped(activity: Activity) { started-- }
+            override fun onActivityCreated(activity: Activity, state: Bundle?) = Unit
+            override fun onActivityResumed(activity: Activity) = Unit
+            override fun onActivityPaused(activity: Activity) = Unit
+            override fun onActivitySaveInstanceState(activity: Activity, state: Bundle) = Unit
+            override fun onActivityDestroyed(activity: Activity) = Unit
+        })
+    }
+
+    /** Suma de las generaciones de los volúmenes: sube con cada alta, cambio o baja. */
+    private fun currentGeneration(): Long = try {
+        MediaStore.getExternalVolumeNames(app).sumOf { MediaStore.getGeneration(app, it) }
+    } catch (e: Exception) {
+        -2L // No se pudo saber: que se vuelva a leer.
     }
 
     /** Vuelve a leer MediaStore. Con [debounce] agrupa ráfagas de cambios (p. ej. al mover 100 fotos). */
@@ -103,6 +132,7 @@ object MediaRepo {
         pending?.cancel()
         pending = scope.launch {
             if (debounce) delay(400)
+            val gen = currentGeneration()
             val all = try {
                 query(trashed = false)
             } catch (e: SecurityException) {
@@ -115,14 +145,17 @@ object MediaRepo {
             } catch (e: SecurityException) {
                 emptyList()
             }
+            generation = gen
         }
     }
 
     suspend fun reload() = withContext(Dispatchers.Default) {
         pending?.cancel()
+        val gen = currentGeneration()
         _media.value = query(trashed = false)
         _trash.value = query(trashed = true)
         _loaded.value = true
+        generation = gen
     }
 
     private fun query(trashed: Boolean): List<Media> {

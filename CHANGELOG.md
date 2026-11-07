@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+- New photos (for example, just taken with the camera) show up when you return to the gallery, without closing and reopening it.
+
 ## 0.7.0
 
 - Plain background: a new option in Settings, as in the other apps of the suite.

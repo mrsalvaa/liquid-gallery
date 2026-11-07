@@ -1,5 +1,9 @@
 # Registro de cambios
 
+## 0.7.1
+
+- Las fotos nuevas (por ejemplo, recién sacadas con la cámara) aparecen al volver a la galería, sin tener que cerrarla y abrirla.
+
 ## 0.7.0
 
 - Fondo liso: nueva opción en Ajustes, como en las demás apps de la suite.

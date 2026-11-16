@@ -84,7 +84,7 @@ Descarga el APK desde [Releases](../../releases) e instálalo (Android 12 o supe
 Comprueba que el archivo no está alterado:
 
 ```bash
-sha256sum -c liquid-gallery-v0.7.3.apk.sha256
+sha256sum -c liquid-gallery-v0.8.0.apk.sha256
 ```
 
 Y que está firmado con la clave del proyecto (huella SHA-256 del certificado):
@@ -94,7 +94,7 @@ Y que está firmado con la clave del proyecto (huella SHA-256 del certificado):
 ```
 
 ```bash
-apksigner verify --print-certs liquid-gallery-v0.7.3.apk
+apksigner verify --print-certs liquid-gallery-v0.8.0.apk
 ```
 
 ## Compilar

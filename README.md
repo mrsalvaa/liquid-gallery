@@ -55,7 +55,7 @@ Get the APK from [Releases](../../releases) and install it (Android 12 or later)
 Check the file wasn't altered:
 
 ```bash
-sha256sum -c liquid-gallery-v0.7.3.apk.sha256
+sha256sum -c liquid-gallery-v0.8.0.apk.sha256
 ```
 
 And that it's signed with the project key (certificate SHA-256 fingerprint):
@@ -65,7 +65,7 @@ And that it's signed with the project key (certificate SHA-256 fingerprint):
 ```
 
 ```bash
-apksigner verify --print-certs liquid-gallery-v0.7.3.apk
+apksigner verify --print-certs liquid-gallery-v0.8.0.apk
 ```
 
 ## Build

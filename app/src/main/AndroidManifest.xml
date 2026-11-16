@@ -32,6 +32,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:supportsPictureInPicture="true"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize" />
@@ -111,6 +112,7 @@
         <activity
             android:name=".ViewerActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:supportsPictureInPicture="true"
             android:exported="true"
             android:label="@string/app_name"
             android:taskAffinity=""

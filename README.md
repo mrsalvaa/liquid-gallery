@@ -33,6 +33,9 @@ Screenshots use made-up sample images.
   long-press and drag to multi-select, tap a date to select the whole day, fast date scroller.
 - **Viewer**: swipe between items, pinch/double-tap zoom with tiled loading for huge photos, video
   playback with glass controls, animated GIFs. Swipe down to close, up for details (EXIF).
+- **Video player**: double-tap the sides to skip (5 to 30 s), swipe sideways to seek with a counter,
+  swipe up/down for brightness and volume, hold for 2x, speed, repeat, touch lock, rotate button,
+  floating window (PiP) and a cinema mode that lights the black bars with the video's colours.
 - **Albums**: Camera first, Favorites and Videos, create albums, move/copy, hide albums, album
   groups, custom/name/count/date ordering.
 - **Archive** (hidden from Pictures, kept in its album) and **Hidden**: a private vault inside the

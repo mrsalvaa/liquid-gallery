@@ -1,6 +1,15 @@
 package dev.liquidgallery.ui.screens
 
 import android.app.Activity
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.IntSize
 import android.content.Intent
 import android.view.TextureView
 import androidx.activity.compose.BackHandler
@@ -125,7 +134,12 @@ import dev.liquidgallery.ui.glass.GlassIconButton
 import dev.liquidgallery.ui.glass.GlassSurface
 import dev.liquidgallery.ui.glass.LocalActionSheet
 import dev.liquidgallery.ui.glass.LocalBackdrop
+import dev.liquidgallery.ui.glass.DarkGlass
+import dev.liquidgallery.ui.glass.LocalFloating
 import dev.liquidgallery.ui.glass.LocalGlass
+import dev.liquidgallery.ui.glass.SolidDark
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.foundation.layout.BoxWithConstraints
 import dev.liquidgallery.ui.glass.LocalPrompt
 import dev.liquidgallery.ui.glass.PromptSpec
 import dev.liquidgallery.ui.glass.SheetAction
@@ -204,15 +218,17 @@ fun ViewerScreen(
     var chrome by rememberSaveable { mutableStateOf(true) }
     var details by rememberSaveable { mutableStateOf(false) }
     var zoomed by remember { mutableStateOf(false) }
+    // Vídeo en marcha: el visor pasa a ser un reproductor (sin pasar de página ni barras).
+    var playingId by remember { mutableStateOf<Long?>(null) }
+    var fill by remember { mutableStateOf(false) }
+    val playerMode = current.isVideo && playingId == current.id
     BackHandler(enabled = details) { details = false }
     BackHandler(enabled = !details) { close() }
 
     // Fondo: negro, salvo en tema claro con los controles a la vista.
-    val dark = !chrome || p.dark
+    val dark = !chrome || p.dark || playerMode
     val bg by animateColorAsState(if (dark) Color.Black else Color(0xFFF4F5F9), label = "bg")
     val fg = if (dark) Color.White else Color(0xFF0E1222)
-    SystemBars(visible = chrome, lightIcons = dark, restoreLight = !p.dark)
-
     // Vídeo: un reproductor para todo el visor; solo suena el de la página actual.
     val player = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -221,20 +237,30 @@ fun ViewerScreen(
         }
     }
     DisposableEffect(player) { onDispose { player.release() } }
-    var playingId by remember { mutableStateOf<Long?>(null) }
+    SystemBars(visible = chrome && !playerMode, lightIcons = dark, restoreLight = !p.dark)
     LaunchedEffect(current.id) {
         if (playingId != null && playingId != current.id) {
             player.stop()
             playingId = null
         }
     }
-    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { player.pause() }
+    // En ventana flotante la actividad queda en pausa pero el vídeo sigue; se para al cerrarla.
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        if ((context as? Activity)?.isInPictureInPictureMode != true) player.pause()
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { player.pause() }
+    val inPip = rememberInPip()
     fun play(m: Media) {
         player.setMediaItem(MediaItem.fromUri(m.uri))
         player.prepare()
         player.playWhenReady = true
         playingId = m.id
-        chrome = false
+        fill = false
+    }
+    fun stopPlayer() {
+        player.stop()
+        playingId = null
+        chrome = true
     }
 
     // Deslizar hacia abajo cierra; hacia arriba abre los detalles (y, abiertos, hacia abajo los
@@ -298,6 +324,7 @@ fun ViewerScreen(
                 key = { itemsState.value.getOrNull(it)?.id ?: it },
                 beyondViewportPageCount = 1,
                 pageSpacing = 12.dp,
+                userScrollEnabled = !playerMode,
                 modifier = Modifier
                     .fillMaxSize()
                     .onSizeChanged { screenH = it.height.coerceAtLeast(1) }
@@ -312,7 +339,7 @@ fun ViewerScreen(
                     }
                     .draggable(
                         orientation = Orientation.Vertical,
-                        enabled = !zoomed,
+                        enabled = !zoomed && !playerMode,
                         state = rememberDraggableState { d ->
                             // Hacia arriba (o con los detalles abiertos o abriéndose) el dedo maneja
                             // los detalles; hacia abajo desde la foto entera, la arrastra para cerrar.
@@ -343,6 +370,8 @@ fun ViewerScreen(
                     VideoPage(
                         m, player,
                         playing = playingId == m.id,
+                        fill = fill,
+                        ambient = settings.videoCinema && !inPip,
                         onPlay = { play(m) },
                         onTap = tap,
                     )
@@ -360,7 +389,7 @@ fun ViewerScreen(
         CompositionLocalProvider(LocalBackdrop provides backdrop) {
             // Cabecera: atrás, fecha y hora, más opciones.
             AnimatedVisibility(
-                chrome && !details,
+                chrome && !details && !playerMode,
                 Modifier.align(Alignment.TopCenter),
                 enter = fadeIn() + slideInVertically { -it / 2 },
                 exit = fadeOut() + slideOutVertically { -it / 2 },
@@ -392,16 +421,12 @@ fun ViewerScreen(
 
             // Pie: controles del vídeo y acciones.
             AnimatedVisibility(
-                chrome && !details,
+                chrome && !details && !playerMode,
                 Modifier.align(Alignment.BottomCenter),
                 enter = fadeIn() + slideInVertically { it / 2 },
                 exit = fadeOut() + slideOutVertically { it / 2 },
             ) {
                 Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
-                    if (current.isVideo && playingId == current.id) {
-                        VideoControls(player, fg)
-                        Spacer(Modifier.height(10.dp))
-                    }
                     GlassSurface(Modifier.fillMaxWidth().height(64.dp), shape = CircleShape, strong = true, frost = 6.dp) {
                         Row(
                             Modifier.fillMaxSize().padding(horizontal = 8.dp),
@@ -458,12 +483,40 @@ fun ViewerScreen(
             ) {
                 DetailsCard(current) { details = false }
             }
+
+            if (playerMode) {
+                // Sobre el vídeo el cristal va siempre en oscuro y refracta lo que pasa por debajo.
+                val palette = remember(p) {
+                    when {
+                        p.dark -> p
+                        p.solid -> SolidDark.copy(accentFg = SolidDark.accent)
+                        else -> DarkGlass.copy(accentFg = DarkGlass.accent)
+                    }
+                }
+                CompositionLocalProvider(
+                    LocalGlass provides palette,
+                    LocalFloating provides true,
+                    LocalContentColor provides palette.content,
+                ) {
+                    VideoPlayerOverlay(
+                        player = player,
+                        title = current.name,
+                        seekSeconds = settings.videoSeekSeconds,
+                        fill = fill,
+                        onFill = { fill = it },
+                        cinema = settings.videoCinema,
+                        onCinema = { on -> Stores.settings.update { it.copy(videoCinema = on) } },
+                        pip = !isVault,
+                        onExit = { stopPlayer() },
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun BarButton(icon: ImageVector, label: String, tint: Color, onClick: () -> Unit) {
+internal fun BarButton(icon: ImageVector, label: String, tint: Color, onClick: () -> Unit) {
     Box(
         Modifier
             .size(52.dp)
@@ -522,7 +575,10 @@ private fun ImagePage(m: Media, isCurrent: Boolean, onTap: () -> Unit, onZoomed:
 }
 
 @Composable
-private fun VideoPage(m: Media, player: ExoPlayer, playing: Boolean, onPlay: () -> Unit, onTap: () -> Unit) {
+private fun VideoPage(
+    m: Media, player: ExoPlayer, playing: Boolean, fill: Boolean, ambient: Boolean,
+    onPlay: () -> Unit, onTap: () -> Unit,
+) {
     val ratio = if (m.width > 0 && m.height > 0) m.width.toFloat() / m.height else 16f / 9f
     var videoRatio by remember { mutableFloatStateOf(ratio) }
     if (playing) {
@@ -538,15 +594,60 @@ private fun VideoPage(m: Media, player: ExoPlayer, playing: Boolean, onPlay: () 
             onDispose { player.removeListener(listener) }
         }
     }
-    Box(
+    BoxWithConstraints(
         Modifier.fillMaxSize().clickable(remember { MutableInteractionSource() }, null, onClick = onTap),
         contentAlignment = Alignment.Center,
     ) {
         if (playing) {
+            // Pellizcar: el vídeo crece hasta tapar las franjas negras (se recorta lo que sobra).
+            val screenRatio = maxWidth / maxHeight
+            val cover = if (fill) maxOf(screenRatio / videoRatio, videoRatio / screenRatio) else 1f
+            val scale by animateFloatAsState(cover, spring(dampingRatio = 0.9f, stiffness = 380f), label = "cine")
+            // Modo cine: las franjas negras se iluminan con los colores de lo que se está viendo.
+            var texture by remember { mutableStateOf<TextureView?>(null) }
+            val glow by animateFloatAsState(if (ambient) 1f else 0f, label = "glow")
+            if (glow > 0f) {
+                AmbientGlow(texture, Modifier.fillMaxSize().graphicsLayer { alpha = glow * 0.75f })
+                // La luz sale del vídeo y se apaga hacia los bordes de la pantalla.
+                Box(
+                    Modifier.fillMaxSize().drawBehind {
+                        val barY = (size.height - minOf(size.height, size.width / videoRatio)) / 2f
+                        val barX = (size.width - minOf(size.width, size.height * videoRatio)) / 2f
+                        val far = Color.Black.copy(alpha = 0.85f)
+                        if (barY > 1f) {
+                            drawRect(Brush.verticalGradient(listOf(far, Color.Transparent), 0f, barY), size = Size(size.width, barY))
+                            drawRect(
+                                Brush.verticalGradient(listOf(Color.Transparent, far), size.height - barY, size.height),
+                                Offset(0f, size.height - barY), Size(size.width, barY),
+                            )
+                        }
+                        if (barX > 1f) {
+                            drawRect(Brush.horizontalGradient(listOf(far, Color.Transparent), 0f, barX), size = Size(barX, size.height))
+                            drawRect(
+                                Brush.horizontalGradient(listOf(Color.Transparent, far), size.width - barX, size.width),
+                                Offset(size.width - barX, 0f), Size(barX, size.height),
+                            )
+                        }
+                    },
+                )
+            }
             AndroidView(
-                factory = { TextureView(it).also { tv -> player.setVideoTextureView(tv) } },
-                onRelease = { player.clearVideoTextureView(it) },
-                modifier = Modifier.fillMaxWidth().aspectRatio(videoRatio, matchHeightConstraintsFirst = ratio < 1f),
+                factory = {
+                    TextureView(it).also { tv ->
+                        player.setVideoTextureView(tv)
+                        texture = tv
+                    }
+                },
+                onRelease = {
+                    player.clearVideoTextureView(it)
+                    texture = null
+                },
+                modifier = Modifier
+                    .aspectRatio(videoRatio, matchHeightConstraintsFirst = videoRatio < screenRatio)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    },
             )
         } else {
             AsyncImage(m.thumb(1024), m.name, Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
@@ -562,50 +663,46 @@ private fun VideoPage(m: Media, player: ExoPlayer, playing: Boolean, onPlay: () 
     }
 }
 
+/**
+ * Resplandor del modo cine: una copia diminuta del fotograma actual, estirada a toda la pantalla
+ * y muy desenfocada, detrás del vídeo. Los colores cambian de a poco para que no parpadee.
+ */
 @Composable
-private fun VideoControls(player: ExoPlayer, fg: Color) {
-    val p = LocalGlass.current
-    var position by remember { mutableLongStateOf(0L) }
-    var length by remember { mutableLongStateOf(0L) }
-    var playing by remember { mutableStateOf(player.isPlaying) }
-    var muted by remember { mutableStateOf(player.volume == 0f) }
-    var seeking by remember { mutableStateOf<Float?>(null) }
-    LaunchedEffect(player) {
+private fun AmbientGlow(texture: TextureView?, modifier: Modifier) {
+    val w = 32
+    val h = 18
+    val bitmap = remember { Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888) }
+    val image = remember { bitmap.asImageBitmap() }
+    var tick by remember { mutableIntStateOf(0) }
+    LaunchedEffect(texture) {
+        val view = texture ?: return@LaunchedEffect
+        val sample = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val pixels = IntArray(w * h)
+        val smooth = FloatArray(w * h * 3)
+        var first = true
         while (true) {
-            if (seeking == null) position = player.currentPosition
-            length = player.duration.coerceAtLeast(0)
-            playing = player.isPlaying
-            delay(200)
+            if (view.isAvailable) {
+                view.getBitmap(sample)
+                sample.getPixels(pixels, 0, w, 0, 0, w, h)
+                val k = if (first) 1f else 0.25f
+                for (i in pixels.indices) {
+                    val c = pixels[i]
+                    val j = i * 3
+                    smooth[j] += ((c shr 16 and 0xFF) - smooth[j]) * k
+                    smooth[j + 1] += ((c shr 8 and 0xFF) - smooth[j + 1]) * k
+                    smooth[j + 2] += ((c and 0xFF) - smooth[j + 2]) * k
+                    pixels[i] = (0xFF shl 24) or (smooth[j].toInt() shl 16) or (smooth[j + 1].toInt() shl 8) or smooth[j + 2].toInt()
+                }
+                bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
+                first = false
+                tick++
+            }
+            delay(80)
         }
     }
-    GlassSurface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), strong = true, frost = 6.dp) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            BarButton(if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, str(R.string.play), fg) {
-                if (player.playbackState == Player.STATE_ENDED) player.seekTo(0)
-                if (player.isPlaying) player.pause() else player.play()
-                playing = !playing
-            }
-            Text(duration(seeking?.toLong() ?: position), color = fg, fontSize = 12.sp)
-            Slider(
-                value = (seeking ?: position.toFloat()).coerceIn(0f, length.toFloat().coerceAtLeast(1f)),
-                onValueChange = { seeking = it },
-                onValueChangeFinished = {
-                    seeking?.let { player.seekTo(it.toLong()) }
-                    seeking = null
-                },
-                valueRange = 0f..length.toFloat().coerceAtLeast(1f),
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = p.accent,
-                    inactiveTrackColor = fg.copy(alpha = 0.25f),
-                ),
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-            )
-            Text(duration(length), color = fg, fontSize = 12.sp)
-            BarButton(if (muted) Icons.AutoMirrored.Rounded.VolumeOff else Icons.AutoMirrored.Rounded.VolumeUp, str(R.string.sound), fg) {
-                muted = !muted
-                player.volume = if (muted) 0f else 1f
-            }
+    Canvas(modifier.blur(56.dp)) {
+        if (tick >= 0) {
+            drawImage(image, dstSize = IntSize(size.width.roundToInt(), size.height.roundToInt()), filterQuality = FilterQuality.Low)
         }
     }
 }

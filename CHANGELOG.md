@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- New video player, in the style of Samsung's and with the app's glass:
+  - double-tap the sides to skip back or forward (5 s, or 10, 15 or 30 from Settings), and each further tap adds more; double-tap the centre to pause;
+  - swipe sideways to seek, with a counter showing how far you moved and where you land;
+  - swipe up or down to change brightness (left half) or volume (right half);
+  - hold to play at 2x for as long as you press;
+  - cinema mode: the black bars glow with the colours of what is playing (can be turned off);
+  - pinch to make the video fill the screen;
+  - floating window (PiP), with a pause button;
+  - touch lock, a button to rotate the screen, speed from 0.5x to 2x, and repeat;
+  - the screen stays on while a video plays.
+
 ## 0.7.3
 
 - Tapping anywhere on a thumbnail opens it, edges included (the bottom edge did nothing).

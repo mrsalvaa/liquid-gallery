@@ -1,5 +1,18 @@
 # Registro de cambios
 
+## Sin publicar
+
+- Reproductor de vídeo nuevo, al estilo del de Samsung y con el cristal de la app:
+  - dos toques a los lados saltan atrás o adelante (5 s, o 10, 15 o 30 desde Ajustes) y cada toque seguido suma; dos toques en el centro pausan;
+  - deslizar de lado adelanta o atrasa, con un contador de cuánto se movió y dónde queda;
+  - deslizar hacia arriba o abajo cambia el brillo (mitad izquierda) o el volumen (mitad derecha);
+  - mantener pulsado reproduce a 2x mientras dure;
+  - modo cine: las franjas negras se iluminan con los colores de lo que se está viendo (se puede apagar);
+  - pellizcar hace que el vídeo llene la pantalla;
+  - ventana flotante (PiP), con botón para pausar;
+  - bloqueo de toques, botón para girar la pantalla, velocidad de 0.5x a 2x y repetir;
+  - la pantalla no se apaga mientras se ve un vídeo.
+
 ## 0.7.3
 
 - Tocar cualquier parte de una miniatura la abre, también los bordes (el de abajo no hacía nada).

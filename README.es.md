@@ -37,6 +37,11 @@ seleccionar el día entero. Barra lateral para desplazarte rápido por fechas.
 queda sin memoria con fotos enormes), vídeos con controles propios, GIF animados. Desliza hacia
 abajo para cerrar y hacia arriba para ver los detalles (cámara, ISO, apertura, tamaño...).
 
+**Reproductor de vídeo**: dos toques a los lados para saltar (de 5 a 30 s), desliza de lado para
+adelantar con un contador, hacia arriba o abajo para el brillo y el volumen, mantén pulsado para ir
+a 2x; velocidad, repetir, bloqueo de toques, botón para girar la pantalla, ventana flotante y un
+modo cine que ilumina las franjas negras con los colores del vídeo.
+
 **Álbumes**: Cámara siempre primero, Favoritos y Vídeos, crear álbumes, mover y copiar entre ellos,
 ocultarlos, agruparlos en grupos de álbumes y ordenarlos a mano, por nombre, por cantidad o por fecha.
 
@@ -62,7 +67,7 @@ original. Se guarda como copia o sobrescribiendo la original.
 
 En **Ajustes**: tema (sistema, claro u oscuro), fondo en movimiento o color de énfasis (los mismos
 de Liquid Clock), columnas de la cuadrícula y comportamiento de los vídeos (empezar sin sonido,
-repetir) e icono de la app (Liquid, Material, Samsung, iPhone o Motorola).
+repetir, modo cine, salto del doble toque) e icono de la app (Liquid, Material, Samsung, iPhone o Motorola).
 
 ## Permisos
 

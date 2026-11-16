@@ -27,6 +27,10 @@ data class AppSettings(
     val videoMuted: Boolean = false,
     /** Los vídeos vuelven a empezar al terminar. */
     val videoLoop: Boolean = false,
+    /** Segundos que salta el doble toque en el reproductor. */
+    val videoSeekSeconds: Int = 5,
+    /** Modo cine: las franjas negras se iluminan con los colores del vídeo. */
+    val videoCinema: Boolean = true,
     /** Índice del icono de la app (ver AppIcons). */
     val appIcon: Int = 0,
     /** Ya se ofreció el permiso de gestionar multimedia (para no insistir). */

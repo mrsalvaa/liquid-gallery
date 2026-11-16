@@ -326,6 +326,12 @@ fun SettingsScreen(padding: PaddingValues, onBack: () -> Unit) {
             SettingRow(str(R.string.loop_videos)) {
                 GlassSwitch(s.videoLoop, { v -> edit { it.copy(videoLoop = v) } })
             }
+            SettingRow(str(R.string.player_cinema), subtitle = str(R.string.cinema_hint)) {
+                GlassSwitch(s.videoCinema, { v -> edit { it.copy(videoCinema = v) } })
+            }
+            Text(str(R.string.seek_step), Modifier.padding(top = 10.dp), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            ChipRow(SEEK_STEPS, s.videoSeekSeconds, { str(R.string.seconds_short, it) }) { v -> edit { it.copy(videoSeekSeconds = v) } }
+            Text(str(R.string.seek_step_hint), fontSize = 12.sp, color = p.contentSecondary)
         }
 
         SectionLabel(str(R.string.permissions))

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0
 
 - New video player, in the style of Samsung's and with the app's glass:
   - double-tap the sides to skip back or forward (5 s, or 10, 15 or 30 from Settings), and each further tap adds more; double-tap the centre to pause;

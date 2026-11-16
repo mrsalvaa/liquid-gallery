@@ -1,6 +1,6 @@
 # Registro de cambios
 
-## Sin publicar
+## 0.8.0
 
 - Reproductor de vídeo nuevo, al estilo del de Samsung y con el cristal de la app:
   - dos toques a los lados saltan atrás o adelante (5 s, o 10, 15 o 30 desde Ajustes) y cada toque seguido suma; dos toques en el centro pausan;
